@@ -7,6 +7,7 @@ import sys
 from datetime import datetime
 from multiprocessing import Process
 import re
+from report_generator import report_generator
 
 
 clients = set()
@@ -22,6 +23,7 @@ os.environ['QT_PLUGIN_PATH'] = '/home/russi/Qt/5.15.2/gcc_64/plugins'
 # Example usage:
 print("LD_LIBRARY_PATH:", os.getenv('LD_LIBRARY_PATH'))
 print("QT_PLUGIN_PATH:", os.getenv('QT_PLUGIN_PATH'))
+
 
 def processo_QGC(path=""):
     def DMS_to_DD(coordinate):
@@ -40,6 +42,7 @@ def processo_QGC(path=""):
     report_recording = False
     current_GPS_problem = False
     current_RC_problem = False
+    current_breach_count = 1
     low_battery = False
     currently_flying = False
     REPORT = [] #lista ordenada cronologicamente de alertas
@@ -54,21 +57,36 @@ def processo_QGC(path=""):
             print(f"\n\n{info_extraida[3]}\n\n")  # Processes extracted information
         if "COMEÇAR_RELATÓRIO" in line:
             report_recording = True
+            current_time = datetime.now().time()
             parse = line.split(" ")
-            print(parse)
             lat = f'{parse[2]} {parse[3]} {parse[4]} {parse[5]}'
             lon = f'{parse[6]} {parse[7]} {parse[8]} {parse[9]}'
             lat = DMS_to_DD(lat)
             lon = DMS_to_DD(lon)
-            print(lat,lon)
-            report_gps = {"tag": "GPS_LOW", "time": current_time, "lat": lat, "lon":lon}
-            REPORT.append(report_gps)
+            report_begin = {"tag": "report_start","time": current_time, "lat": lat, "lon":lon}
+            REPORT.append(report_begin)
+        if "FINALIZAR_RELATÓRIO" in line:
+            report_recording = False
+            current_time = datetime.now().time()
+            parse = line.split(" ")
+            lat = f'{parse[2]} {parse[3]} {parse[4]} {parse[5]}'
+            lon = f'{parse[6]} {parse[7]} {parse[8]} {parse[9]}'
+            lat = DMS_to_DD(lat)
+            lon = DMS_to_DD(lon)
+            report_end = {"tag": "report_end","time": current_time, "lat": lat, "lon":lon}
+            REPORT.append(report_end)
+            print(REPORT)
+            report_generator(REPORT)
 
-        if "GPS_LOW_PRECISION" in line:# and not current_GPS_problem:
+        
+
+        if report_recording:
+            print("REPORT RECORDING")
+            if "GPS_LOW_PRECISION" in line and not current_GPS_problem:
                 current_GPS_problem=True
                 current_time = datetime.now().time()
                 parse = line.split(" ")
-                print(parse)
+                #print(parse)
                 lat = f'{parse[2]} {parse[3]} {parse[4]} {parse[5]}'
                 lon = f'{parse[6]} {parse[7]} {parse[8]} {parse[9]}'
                 lat = DMS_to_DD(lat)
@@ -76,21 +94,19 @@ def processo_QGC(path=""):
                 print(lat,lon)
                 report_gps = {"tag": "GPS_LOW", "time": current_time, "lat": lat, "lon":lon}
                 REPORT.append(report_gps)
-
-        if report_recording:
-            print("REPORT RECORDING")
             if "breach_count" in line: #parse[3] = "numero\n"
+                print("BREACH DETECTED1")
                 parse = line.split(" ")
-                if any(char.isdigit() for char in parse[3]):
-                    current_breach_count = int(parse[3].removesuffix("\n"))
-                    if current_breach_count > max_breach_count:
-                        
-                        print("BREACH DETECTED")
-                        report_breach = {"tag": "BREACH", "time": current_time, "lat": float(parse[5]), "lon": float(parse[6])}
-                        REPORT.append(report_breach)
-                        max_breach_count = current_breach_count
+                current_breach_count = int(parse[2])
+                if current_breach_count > max_breach_count:
+                    current_time = datetime.now().time()
+                    print("BREACH DETECTED")
+                    report_breach = {"tag": "BREACH", "time": current_time, "lat": float(parse[5]), "lon": float(parse[6])}
+                    REPORT.append(report_breach)
+                    max_breach_count = current_breach_count
+                    current_breach_count+=1
     
-                print(parse)
+            print(REPORT)
             
             
 
