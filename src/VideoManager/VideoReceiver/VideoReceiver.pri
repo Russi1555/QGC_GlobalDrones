@@ -138,7 +138,7 @@ VideoEnabled {
     INCLUDEPATH += \
         $$PWD
         $$PWD/GStreamer \
-        $$PWD/QtMultimedia
+        #$$PWD/QtMultimedia
 
     iOSBuild {
         OBJECTIVE_SOURCES += \

@@ -10,7 +10,7 @@
 #include <QtQuick/QQuickWindow>
 
 #include "GstVideoReceiver.h"
-#include "GStreamer.h"
+#include "src/VideoManager/VideoReceiver/GStreamer/GStreamer.h"
 #include "VideoReceiver.h"
 #include <gst/gst.h>
 

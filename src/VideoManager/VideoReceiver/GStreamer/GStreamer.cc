@@ -14,7 +14,7 @@
  *   @author Gus Grubba <gus@auterion.com>
  */
 
-#include "GStreamer.h"
+#include "src/VideoManager/VideoReceiver/GStreamer/GStreamer.h"
 #include "GstVideoReceiver.h"
 #include "QGCLoggingCategory.h"
 

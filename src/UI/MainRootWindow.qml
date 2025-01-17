@@ -48,6 +48,24 @@ ApplicationWindow {
         // Start the sequence of first run prompt(s)
         firstRunPromptManager.nextPrompt()
     }
+    Timer {
+            interval: 1; running: true; repeat: true
+            onTriggered: {
+            flyView._tensao_bateria = controller4.battery_tension
+            }
+        }
+
+    Item{
+        id: mvipArea
+        anchors.left: parent.right
+        MAVLinkInspectorPage{
+            id: controller4
+            visible: true
+            width:1
+            height:1
+            z: mainWindow.z - 1
+        }
+    }
 
     QtObject {
         id: firstRunPromptManager

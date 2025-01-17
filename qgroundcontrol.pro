@@ -10,7 +10,7 @@
 QMAKE_PROJECT_DEPTH = 0 # undocumented qmake flag to force absolute paths in makefiles
 
 # DEFINES += QGC_AIRLINK_DISABLED
-
+CONFIG += c++17
 message ("ANDROID_TARGET_ARCH $${ANDROID_TARGET_ARCH} $${QT_ARCH}")
 
 exists($${OUT_PWD}/qgroundcontrol.pro) {
@@ -60,7 +60,7 @@ WindowsBuild {
 # Branding
 #
 
-QGC_APP_NAME        = "QGroundControl"
+QGC_APP_NAME        = "Global Drones QGroundControl"
 QGC_ORG_NAME        = "QGroundControl.org"
 QGC_ORG_DOMAIN      = "org.qgroundcontrol"
 QGC_APP_DESCRIPTION = "Open source ground control app provided by QGroundControl dev team"
@@ -1232,6 +1232,7 @@ contains (CONFIG, DISABLE_VIDEOSTREAMING) {
     HEADERS += \
         src/VideoManager/VideoReceiver/GStreamer/GLVideoItemStub.h \
         src/VideoManager/VideoReceiver/VideoReceiver.h
+        src/VideoManager/VideoReceiver/GStreamer/GStreamer.h
 
     SOURCES += \
         src/VideoManager/VideoReceiver/GStreamer/GLVideoItemStub.cc

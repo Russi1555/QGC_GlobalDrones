@@ -37,6 +37,7 @@ Item {
     property real   _maxSize:           0.75                // Percentage of parent control size
     property real   _minSize:           0.10
     property bool   _componentComplete: false
+    property bool   _isMouseHovered: pipMouseArea.containsMouse
 
     Component.onCompleted: {
         _initForItems()
