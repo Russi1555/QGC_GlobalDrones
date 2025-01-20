@@ -209,5 +209,6 @@
         <file alias="ZoomPlus.svg">src/FlightMap/Images/ZoomPlus.svg</file>
         <file alias="Viewer3D/City3DMapIcon.svg">src/Viewer3D/Images/city_3d_map_icon.svg</file>
         <file alias="GasCan.svg">resources/gas-can.svg</file>
+        <file alias="Generator.svg">resources/generator.svg</file>
     </qresource>
 </RCC>

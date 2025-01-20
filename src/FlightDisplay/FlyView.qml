@@ -65,7 +65,7 @@ Item {
     property real  mainViewHeight: parent.height*5/6
     property real  mainViewWidth : parent.width - (parent.height - mainViewHeight) //garantir simetria
     property bool _cameraExchangeActive : false
-    property var _pct_bateria: _activeVehicle ? _activeVehicle.batteries.get(0).percentRemaining.valueString + "%" : "0%"
+    property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.valueString + "%"
     property var _tensao_bateria: _activeVehicle? 9 : 0
     property var _current_bateria: _activeVehicle? 9 : 0
     property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue
@@ -86,6 +86,16 @@ Item {
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
+
+    Timer{
+        id: propertyValuesUpdater
+        interval: 500
+        running: true
+        repeat: true
+        onTriggered:{
+            _pct_bateria = _activeVehicle.batteries.get(0).percentRemaining.rawValue
+        }
+    }
 
     function _calcCenterViewPort() {
         var newToolInset = Qt.rect(0, 0, width, height)
@@ -133,6 +143,7 @@ Item {
                 fillMode:           Image.PreserveAspectFit
                 color:              "white"
 
+
             }
 
 
@@ -142,25 +153,25 @@ Item {
                 anchors.left: batteryPercentageIcon.right
                 spacing:                0
 
-                QGCLabel {
+                Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   _pct_bateria
+                    text:                   _pct_bateria > 9? _pct_bateria+"%": "0"+_pct_bateria+"%"
                     font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
-                QGCLabel {
+                Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   (_tensao_bateria/100) + " V"
                     font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
-                QGCLabel {
+                Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   (_tensao_bateria/100) + " mA"
+                    text:                   (_current_bateria/100) + " mA"
                     font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
 
@@ -247,7 +258,12 @@ Item {
 
                            MouseArea { // Torna a barra interativa
                                anchors.fill: parent
-                               onClicked: console.log("Célula", index + 1, "tensão:", model.tensao);
+                               onClicked: {console.log("Célula", index + 1, "tensão:", model.tensao);
+                               console.log(_activeVehicle)
+                                   console.log(_activeVehicle.batteries.count)
+                                   console.log(_activeVehicle.batteries.get(0).percentRemaining.valueString)
+
+                               }
                            }
                        }
                     }
@@ -269,9 +285,9 @@ Item {
            }
            Rectangle{
                 id: gasolinePercentageBar
-                anchors.top: parent.top
+                anchors.top: gasolinePercentageIcon.top
                 anchors.left: gasolinePercentageIcon.right
-                anchors.margins: _toolsMargin
+                //anchors.margins: _toolsMargin
                 width: gasolinePercentageIcon.width/3
                 height: parent.height*2/3
                 color: gasMouseArea.containsMouse? "green": "red"
@@ -301,10 +317,31 @@ Item {
            }
 
 
-           //operação do gerador
+           //operação do gerador (pode ser pop-up por que é fudido de importante?) incluir pop-up/cor dinamica/etc
+           QGCColoredImage {
+               id: generatorFunctionalityIcon
+               anchors.top:        parent.top
+               anchors.left:       gasolinePercentageBar.right
+               anchors.margins:    _toolsMargin*2
+               width:              height
+               height:             parent.height*2/3
+               source:             "/qmlimages/Generator.svg"
+               fillMode:           Image.PreserveAspectFit
+               color:              "white"
+            }
 
-           //satelite
-
+           //satelite https://forest-gis.com/2018/01/acuracia-gps-o-que-sao-pdop-hdop-gdop-multi-caminho-e-outros.html/?srsltid=AfmBOorX7DD9JggA1vLTP2DuhOK44T28jHasCbLA0nv5nSnLX7irYLlW
+           QGCColoredImage {
+               id: satteliteInformationIcon
+               anchors.top:        parent.top
+               anchors.left:       generatorFunctionalityIcon.right
+               anchors.margins:    _toolsMargin*2
+               width:              height
+               height:             parent.height*2/3
+               source:             "/qmlimages/Gps.svg"
+               fillMode:           Image.PreserveAspectFit
+               color:              "white"
+            } //activeVehicle.gps.count.rawValue (NUM SATELITES); _activeVehicle.gps.hdop.rawValue (HDOP); globals.activeVehicle.gps.lock.rawValue (PDOP)
            //enlace
 
     }

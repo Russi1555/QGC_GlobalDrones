@@ -70,6 +70,7 @@ AnalyzePage {
                 if (controller.activeSystem.messages.get(i).name ==="POWER_STATUS"){
                     curSystem.selected = i
                     battery_tension = controller.activeSystem.messages.get(i).fields.get(0).value
+                    console.log(battery_tension)
                 }
 
                 if (controller.activeSystem.messages.get(i).name === "BATTERY_STATUS"){
