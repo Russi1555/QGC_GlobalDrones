@@ -68,6 +68,7 @@ Item {
     property var _pct_bateria: _activeVehicle ? _activeVehicle.batteries.get(0).percentRemaining.valueString + "%" : "0%"
     property var _tensao_bateria: _activeVehicle? 9 : 0
     property var _current_bateria: _activeVehicle? 9 : 0
+    property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue
 
     property real _tensao_cell_1: 50 //PLACEHOLDER
     property real _tensao_cell_2: 45 //PLACEHOLDER
@@ -117,12 +118,7 @@ Item {
                 }
             }
 
-        Item{
-            id: batteryDataArea
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: _pipView.right
-            width: height
+
 
 
 
@@ -257,7 +253,59 @@ Item {
                     }
 
            }
-        }
+
+            //gasolina
+           QGCColoredImage {
+               id: gasolinePercentageIcon
+               anchors.top:        parent.top
+               anchors.left:       cellsTensionArea.right
+               anchors.margins:    _toolsMargin
+               width:              height
+               height:             parent.height*2/3
+               source:             "/qmlimages/GasCan.svg"
+               fillMode:           Image.PreserveAspectFit
+               color:              "white"
+
+           }
+           Rectangle{
+                id: gasolinePercentageBar
+                anchors.top: parent.top
+                anchors.left: gasolinePercentageIcon.right
+                anchors.margins: _toolsMargin
+                width: gasolinePercentageIcon.width/3
+                height: parent.height*2/3
+                color: gasMouseArea.containsMouse? "green": "red"
+
+                MouseArea{
+                    id: gasMouseArea
+                    anchors.fill: parent
+                    hoverEnabled : true
+
+                }
+
+                Rectangle{
+                     anchors.top: parent.top
+                     anchors.left: parent.left
+                     width: parent.width
+                     height: parent.height*(0.3) // dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
+                     color: "black"
+                }
+
+                Rectangle{
+                    anchors.fill: parent
+                    color: "transparent"
+                    border.width: 2
+                    border.color: "lightgray"
+                }
+
+           }
+
+
+           //operação do gerador
+
+           //satelite
+
+           //enlace
 
     }
 
