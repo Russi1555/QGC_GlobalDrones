@@ -68,7 +68,17 @@ Item {
     property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.valueString + "%"
     property var _tensao_bateria: _activeVehicle? 9 : 0
     property var _current_bateria: _activeVehicle? 9 : 0
+    property var _current_generator: 0
     property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue
+    property int _satCount: 0
+    property int _satPDOP: 0
+    property int _rcQuality: 0
+    property var _current_battery_ARRAY: []
+    property var _current_generator_ARRAY: []
+    property var _returnFunctionArray: []
+    property bool flagAlertaGerador: false
+    property var oldGeneratorMediamValue: 0
+
 
     property real _tensao_cell_1: 50 //PLACEHOLDER
     property real _tensao_cell_2: 45 //PLACEHOLDER
@@ -87,15 +97,7 @@ Item {
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
 
-    Timer{
-        id: propertyValuesUpdater
-        interval: 500
-        running: true
-        repeat: true
-        onTriggered:{
-            _pct_bateria = _activeVehicle.batteries.get(0).percentRemaining.rawValue
-        }
-    }
+
 
     function _calcCenterViewPort() {
         var newToolInset = Qt.rect(0, 0, width, height)
@@ -106,6 +108,51 @@ Item {
         toolbar.dropMessageIndicatorTool();
     }
 
+    function generatorAlert(batValues, gerValues, oldGerMed){
+        var medBat = 0;
+        var medGer = 0;
+        var flagAlert = false;
+        for (var i = 0; i<10; i++){
+            medBat = medBat + batValues[i];
+            medGer = medGer + gerValues[i];
+        }
+        medBat = medBat/10;
+        medGer = medGer/10;
+
+        //Se a média da corrente do gerador esta próxima de 0, levanta flag
+        if (Math.abs(medGer)<1){
+            flagAlert = true;
+        }
+        //Se a media da corrente da bateria é maior que do gerador E a média do gerador está caindo, levanta flag
+        else if (medBat > medGer && oldGerMed > medGer) {
+            flagAlert = true;
+        }
+
+        return [flagAlert, medGer];
+    }
+
+    Timer{
+        id: propertyValuesUpdater
+        interval: 100
+        running: true
+        repeat: true
+        onTriggered:{
+            _pct_bateria = _activeVehicle.batteries.get(0).percentRemaining.rawValue
+            _satCount = _activeVehicle.gps.count.rawValue
+            _satPDOP = _activeVehicle.gps.lock.rawValue
+
+            //Monitoramento do gerador
+            _current_battery_ARRAY.push(_current_bateria) //populando dinamicamente array de valores de corrente da bateria
+            _current_generator_ARRAY.push(_current_generator)//populando dinamicamente array de valores de corrente do gerador
+            if(_current_generator.length === 20){ //sabendo que recebemos um dado novo a cada 0.1 segundos, (ver c/ Erich)
+                _returnFunctionArray = generatorAlert(_current_battery_ARRAY, _current_generator_ARRAY, oldGeneratorMediamValue);//executa função
+                flagAlertaGerador = _returnFunctionArray[0]; //atualiza flag geral com valor booleano retornado da função
+                oldGeneratorMediamValue = _returnFunctionArray[1]; //atualiza valor de média
+                _current_battery_ARRAY.shift(); //apaga primeiro elemento (ver c/Erich se é pra apagar o primeiro elemento ou todos)
+                _current_generator_ARRAY.shift();
+            }
+        }
+    }
 
     //**************************************************************************************************//
     //                          BOTTOM VIEW AREA                                                        //
@@ -120,6 +167,7 @@ Item {
 
 
         Rectangle {
+                id: gradientBar
                 anchors.fill: parent
 
                 gradient: Gradient {
@@ -128,11 +176,7 @@ Item {
                 }
             }
 
-
-
-
-
-            QGCColoredImage {
+        QGCColoredImage {
                 id: batteryPercentageIcon
                 anchors.top:        parent.top
                 anchors.left:       parent.left
@@ -146,8 +190,7 @@ Item {
 
             }
 
-
-           ColumnLayout {
+        ColumnLayout {
                 id:                     batteryInfoColumn
                 anchors.top: parent.top
                 anchors.left: batteryPercentageIcon.right
@@ -177,7 +220,7 @@ Item {
 
             }
 
-           Rectangle {
+        Rectangle {
                id: cellsTensionArea
                anchors.top: parent.top
                anchors.left: batteryInfoColumn.right
@@ -270,8 +313,8 @@ Item {
 
            }
 
-            //gasolina
-           QGCColoredImage {
+        //gasolina
+        QGCColoredImage {
                id: gasolinePercentageIcon
                anchors.top:        parent.top
                anchors.left:       cellsTensionArea.right
@@ -283,7 +326,8 @@ Item {
                color:              "white"
 
            }
-           Rectangle{
+
+        Rectangle{
                 id: gasolinePercentageBar
                 anchors.top: gasolinePercentageIcon.top
                 anchors.left: gasolinePercentageIcon.right
@@ -316,9 +360,8 @@ Item {
 
            }
 
-
-           //operação do gerador (pode ser pop-up por que é fudido de importante?) incluir pop-up/cor dinamica/etc
-           QGCColoredImage {
+        //operação do gerador (pode ser pop-up por que é fudido de importante?) incluir pop-up/cor dinamica/etc
+        QGCColoredImage {
                id: generatorFunctionalityIcon
                anchors.top:        parent.top
                anchors.left:       gasolinePercentageBar.right
@@ -330,8 +373,9 @@ Item {
                color:              "white"
             }
 
-           //satelite https://forest-gis.com/2018/01/acuracia-gps-o-que-sao-pdop-hdop-gdop-multi-caminho-e-outros.html/?srsltid=AfmBOorX7DD9JggA1vLTP2DuhOK44T28jHasCbLA0nv5nSnLX7irYLlW
-           QGCColoredImage {
+        //satelite https://forest-gis.com/2018/01/acuracia-gps-o-que-sao-pdop-hdop-gdop-multi-caminho-e-outros.html/?srsltid=AfmBOorX7DD9JggA1vLTP2DuhOK44T28jHasCbLA0nv5nSnLX7irYLlW
+        //activeVehicle.gps.count.rawValue (NUM SATELITES); _activeVehicle.gps.hdop.rawValue (HDOP); globals.activeVehicle.gps.lock.rawValue (PDOP)
+        QGCColoredImage {
                id: satteliteInformationIcon
                anchors.top:        parent.top
                anchors.left:       generatorFunctionalityIcon.right
@@ -341,9 +385,75 @@ Item {
                source:             "/qmlimages/Gps.svg"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
-            } //activeVehicle.gps.count.rawValue (NUM SATELITES); _activeVehicle.gps.hdop.rawValue (HDOP); globals.activeVehicle.gps.lock.rawValue (PDOP)
-           //enlace
+            }
 
+        ColumnLayout {
+                id:                     satteliteInfoColumn
+                anchors.top: parent.top
+                anchors.left: satteliteInformationIcon.right
+                spacing:                0
+
+                Text {
+                    Layout.alignment:       Qt.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    color:                  "White"
+                    text:                   "Count: " + _satCount
+                    font.pointSize:         ScreenTools.mediumFontPixelHeight
+                }
+                Text {
+                    Layout.alignment:       Qt.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    color:                  "White"
+                    text:                   "PDOP: "+ _satPDOP
+                    font.pointSize:         ScreenTools.mediumFontPixelHeight
+                }
+
+            }
+
+        //enlace
+        QGCColoredImage {
+               id: rcInformationIcon
+               anchors.top:        parent.top
+               anchors.left:       satteliteInfoColumn.right
+               anchors.margins:    _toolsMargin*2
+               width:              height
+               height:             parent.height*2/3
+               source:             "/qmlimages/RC.svg"
+               fillMode:           Image.PreserveAspectFit
+               color:              "white"
+            }
+        Rectangle{
+                id: rcQualityBar
+                anchors.top: gasolinePercentageIcon.top
+                anchors.left: gasolinePercentageIcon.right
+                //anchors.margins: _toolsMargin
+                width: gasolinePercentageIcon.width/3
+                height: parent.height*2/3
+                color: gasMouseArea.containsMouse? "green": "red"
+
+                MouseArea{
+                    id: rcMouseArea
+                    anchors.fill: parent
+                    hoverEnabled : true
+
+                }
+
+                Rectangle{
+                     anchors.top: parent.top
+                     anchors.left: parent.left
+                     width: parent.width
+                     height: parent.height*(0.3) // dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
+                     color: "black"
+                }
+
+                Rectangle{
+                    anchors.fill: parent
+                    color: "transparent"
+                    border.width: 2
+                    border.color: "lightgray"
+                }
+
+           }
     }
 
 //**************************************************************************************************//
