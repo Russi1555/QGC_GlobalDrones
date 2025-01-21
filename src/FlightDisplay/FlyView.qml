@@ -65,7 +65,7 @@ Item {
     property real  mainViewHeight: parent.height*5/6
     property real  mainViewWidth : parent.width - (parent.height - mainViewHeight) //garantir simetria
     property bool _cameraExchangeActive : false
-    property var _pct_bateria: _activeVehicle.batteries.get(0).percentRemaining.valueString + "%"
+    property var _pct_bateria: 0//_activeVehicle.batteries.get(0).percentRemaining.valueString + "%"
     property var _tensao_bateria: _activeVehicle? 9 : 0
     property var _current_bateria: _activeVehicle? 9 : 0
     property var _current_generator: 0
@@ -112,15 +112,15 @@ Item {
         var medBat = 0;
         var medGer = 0;
         var flagAlert = false;
-        for (var i = 0; i<10; i++){
+        for (var i = 0; i<20; i++){
             medBat = medBat + batValues[i];
             medGer = medGer + gerValues[i];
         }
-        medBat = medBat/10;
-        medGer = medGer/10;
+        medBat = medBat;
+        medGer = medGer;
 
         //Se a média da corrente do gerador esta próxima de 0, levanta flag
-        if (Math.abs(medGer)<1){
+        if (Math.abs(medGer)<20){
             flagAlert = true;
         }
         //Se a media da corrente da bateria é maior que do gerador E a média do gerador está caindo, levanta flag
@@ -144,12 +144,13 @@ Item {
             //Monitoramento do gerador
             _current_battery_ARRAY.push(_current_bateria) //populando dinamicamente array de valores de corrente da bateria
             _current_generator_ARRAY.push(_current_generator)//populando dinamicamente array de valores de corrente do gerador
-            if(_current_generator.length === 20){ //sabendo que recebemos um dado novo a cada 0.1 segundos, (ver c/ Erich)
+            if(_current_generator_ARRAY.length === 20){ //sabendo que recebemos um dado novo a cada 0.1 segundos, (ver c/ Erich)
                 _returnFunctionArray = generatorAlert(_current_battery_ARRAY, _current_generator_ARRAY, oldGeneratorMediamValue);//executa função
                 flagAlertaGerador = _returnFunctionArray[0]; //atualiza flag geral com valor booleano retornado da função
                 oldGeneratorMediamValue = _returnFunctionArray[1]; //atualiza valor de média
                 _current_battery_ARRAY.shift(); //apaga primeiro elemento (ver c/Erich se é pra apagar o primeiro elemento ou todos)
                 _current_generator_ARRAY.shift();
+                //console.log(_current_battery_ARRAY);
             }
         }
     }
@@ -424,12 +425,12 @@ Item {
             }
         Rectangle{
                 id: rcQualityBar
-                anchors.top: gasolinePercentageIcon.top
-                anchors.left: gasolinePercentageIcon.right
+                anchors.top: rcInformationIcon.top
+                anchors.left: rcInformationIcon.right
                 //anchors.margins: _toolsMargin
-                width: gasolinePercentageIcon.width/3
+                width: rcInformationIcon.width/3
                 height: parent.height*2/3
-                color: gasMouseArea.containsMouse? "green": "red"
+                color: rcMouseArea.containsMouse? "green": "red"
 
                 MouseArea{
                     id: rcMouseArea
@@ -442,7 +443,7 @@ Item {
                      anchors.top: parent.top
                      anchors.left: parent.left
                      width: parent.width
-                     height: parent.height*(0.3) // dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
+                     height: parent.height*(0.3) // dinamico de acordo com 1-(% RC). cor há de ser dinamica também. Ver como pegar esse valor
                      color: "black"
                 }
 
@@ -454,8 +455,12 @@ Item {
                 }
 
            }
-    }
 
+        //Temperatura Gerador
+
+
+        //Temperatura Rotores
+    }
 //**************************************************************************************************//
 //                          LATERAL VIEW AREA                                                       //
 //**************************************************************************************************//
