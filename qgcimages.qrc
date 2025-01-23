@@ -210,5 +210,8 @@
         <file alias="Viewer3D/City3DMapIcon.svg">src/Viewer3D/Images/city_3d_map_icon.svg</file>
         <file alias="GasCan.svg">resources/gas-can.svg</file>
         <file alias="Generator.svg">resources/generator.svg</file>
+        <file alias="MotorTemp.svg">resources/motorTemp.svg</file>
+        <file alias="RotorsTemp.svg">resources/rotorsTemp.svg</file>
+        <file alias="GD25Layout.svg">resources/HexarotorLayout.svg</file>
     </qresource>
 </RCC>

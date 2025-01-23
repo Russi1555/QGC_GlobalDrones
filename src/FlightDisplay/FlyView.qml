@@ -93,6 +93,13 @@ Item {
     property real _tensao_cell_11: 40 //PLACEHOLDER
     property real _tensao_cell_12: 90 //PLACEHOLDER
 
+    property real _temperatura_rotor_1: 50 //PLACEHOLDER
+    property real _temperatura_rotor_2: 45 //PLACEHOLDER
+    property real _temperatura_rotor_3: 70 //PLACEHOLDER
+    property real _temperatura_rotor_4: 20 //PLACEHOLDER
+    property real _temperatura_rotor_5: 80 //PLACEHOLDER
+    property real _temperatura_rotor_6: 50 //PLACEHOLDER
+
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -425,9 +432,9 @@ Item {
             }
         Rectangle{
                 id: rcQualityBar
-                anchors.top: rcInformationIcon.top
+                anchors.top: parent.top
                 anchors.left: rcInformationIcon.right
-                //anchors.margins: _toolsMargin
+                anchors.margins: _toolsMargin
                 width: rcInformationIcon.width/3
                 height: parent.height*2/3
                 color: rcMouseArea.containsMouse? "green": "red"
@@ -457,10 +464,147 @@ Item {
            }
 
         //Temperatura Gerador
+        QGCColoredImage {
+               id: motorTemperatureInformationIcon
+               anchors.top:        parent.top
+               anchors.left:       rcQualityBar.right
+               anchors.margins:    _toolsMargin*2
+               width:              height
+               height:             parent.height*2/3
+               source:             "/qmlimages/MotorTemp.svg"
+               fillMode:           Image.PreserveAspectFit
+               color:              "white"
+            }
+        Rectangle{
+                id: motorTemperatureBar
+                anchors.top: parent.top
+                anchors.left: motorTemperatureInformationIcon.right
+                anchors.margins: _toolsMargin
+                width: motorTemperatureInformationIcon.width/3
+                height: parent.height*2/3
+                color: motorTemperatureMouseArea.containsMouse? "green": "red"
 
+                MouseArea{
+                    id: motorTemperatureMouseArea
+                    anchors.fill: parent
+                    hoverEnabled : true
+
+                }
+
+                Rectangle{
+                     anchors.top: parent.top
+                     anchors.left: parent.left
+                     width: parent.width
+                     height: parent.height*(0.3) // dinamico de acordo com temperatura do motor (esperar essa informação ficar disponível)
+                     color: "black"
+                }
+
+                Rectangle{
+                    anchors.fill: parent
+                    color: "transparent"
+                    border.width: 2
+                    border.color: "lightgray"
+                }
+
+           }
 
         //Temperatura Rotores
+        QGCColoredImage {
+               id: rotorTemperatureInformationIcon
+               anchors.top:        parent.top
+               anchors.left:       motorTemperatureBar.right
+               anchors.margins:    _toolsMargin*2
+               width:              height
+               height:             parent.height*2/3
+               source:             "/qmlimages/RotorsTemp.svg"
+               fillMode:           Image.PreserveAspectFit
+               color:              "white"
+            }
+        Rectangle {
+               id: rotorsTempArea
+               anchors.top: parent.top
+               anchors.left: rotorTemperatureInformationIcon.right
+               anchors.margins: _toolsMargin * 1.5
+               width: height * 2
+               height: rotorTemperatureInformationIcon.height
+               color: "black" // Background color
+
+               // Borda com aparência de aço
+               Rectangle {
+                   anchors.fill: parent
+                   color: "transparent"
+                   border.width: 2
+                   z: parent.z+13
+                   border.color: "lightgray" // Cor base da borda
+               }
+               Rectangle {
+                       anchors.fill: parent
+                       z: -1
+                       color: "black"
+                       opacity: 0.3
+                       scale: 1.05
+                       anchors.verticalCenter: parent.verticalCenter
+                       anchors.horizontalCenter: parent.horizontalCenter
+                   }
+
+               // Modelo dinâmico com tensões das células
+                   ListModel {
+                       id: tempRotorModel
+                   }
+
+                   // Popula o modelo com valores dinamicamente
+                   Component.onCompleted: {
+                       tempRotorModel.append({ temperatura: _temperatura_rotor_1 });
+                       tempRotorModel.append({ temperatura: _temperatura_rotor_2 });
+                       tempRotorModel.append({ temperatura: _temperatura_rotor_3 });
+                       tempRotorModel.append({ temperatura: _temperatura_rotor_4 });
+                       tempRotorModel.append({ temperatura: _temperatura_rotor_5 });
+                       tempRotorModel.append({ temperatura: _temperatura_rotor_6 });
+
+                   }
+
+                   Timer{//Atualiza os valores periodicamente [TODO: mudar interval depois]
+                        interval: 10000; running: true; repeat: true
+                        onTriggered: {
+                        tempRotorModel.set(0, { temperatura: _temperatura_rotor_1 });
+                        tempRotorModel.set(1, { temperatura: _temperatura_rotor_2 });
+                        tempRotorModel.set(2, { temperatura: _temperatura_rotor_3 });
+                        tempRotorModel.set(3, { temperatura: _temperatura_rotor_4 });
+                        tempRotorModel.set(4, { temperatura: _temperatura_rotor_5 });
+                        tempRotorModel.set(5, { temperatura: _temperatura_rotor_6 });
+                       }
+                    }
+
+                   Repeater {
+                       model: tempRotorModel
+
+                       Rectangle {
+                           width: parent.width / 6
+                           height: model.temperatura // Altura proporcional à temperatura
+                           x: index * parent.width / 6 // Posiciona horizontalmente
+                           anchors.bottom: parent.bottom
+                           z: parent.z + 1
+                           color: "green"
+                           border.color: "black"//index === 0 ? (motor1_selected ? "yellow" : "black") : "black"
+                           border.width: 3//index === 0 && motor1_selected ? 3 : 1
+
+                           MouseArea { // Torna a barra interativa
+                               anchors.fill: parent
+                               onClicked: {console.log("Célula", index + 1, "tensão:", model.tensao);
+                               console.log(_activeVehicle)
+                                   console.log(_activeVehicle.batteries.count)
+                                   console.log(_activeVehicle.batteries.get(0).percentRemaining.valueString)
+
+                               }
+                           }
+                       }
+                    }
+
+           }
+
+
     }
+
 //**************************************************************************************************//
 //                          LATERAL VIEW AREA                                                       //
 //**************************************************************************************************//
@@ -470,7 +614,32 @@ Item {
         anchors.bottom : lateralDataArea.top
         width : parent.width - mainViewWidth
         height: mainViewHeight
-
+        //Ilustração Aeronave {EXPERIMENTAR COLOCAR NO FUNDO DO LATERAL VIEW AREA PRA MANTER CENTRALIZAÇÃO HORIZONTAL}
+        /*QGCColoredImage {0
+               id: aircraftIcon
+               anchors.top:        parent.bottom
+               anchors.left:       parent.left
+               //anchors.verticalCenter: parent.verticalCenter
+               //anchors.margins:    _toolsMargin
+               width:              parent.width
+               height:             width
+               source:             "/qmlimages/Airframe/HexaRotorX"
+               fillMode:           Image.PreserveAspectFit
+               color:              "white"
+               z:1000
+               // Add a circle on top of the image
+                   Rectangle {
+                       id: circleOverlay
+                       x: parent.width*2/12
+                       y: parent.height*1/24
+                       width: parent.width*17/64             // Adjust the size of the circle
+                       height: width              // Keep width and height the same for a perfect circle
+                       radius: width / 2       // Make it circular
+                       color:  Qt.rgba(1, 0, 0, 0.5)            // Color of the circle
+                       //anchors.centerIn: parent // Position the circle at the center of the image
+                       z: 1100                 // Ensure it appears above the image
+                   }
+            }*/
 
 
         Rectangle {
