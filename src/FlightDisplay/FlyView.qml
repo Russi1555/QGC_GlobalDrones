@@ -62,6 +62,7 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property var    _mapControl:            mapControl
 
+
     property real  mainViewHeight: parent.height*5/6
     property real  mainViewWidth : parent.width - (parent.height - mainViewHeight) //garantir simetria
     property bool _cameraExchangeActive : false
@@ -77,8 +78,9 @@ Item {
     property var _current_generator_ARRAY: []
     property var _returnFunctionArray: []
     property bool flagAlertaGerador: false
-    property var oldGeneratorMediamValue: 0
-
+    property real oldGeneratorMediamValue: 0
+    property var  _distanceToHome:     _activeVehicle.distanceToHome.rawValue
+    property var  _distanceToWP: _activeVehicle.distanceToNextWP.rawValue
 
     property real _tensao_cell_1: 50 //PLACEHOLDER
     property real _tensao_cell_2: 45 //PLACEHOLDER
@@ -158,6 +160,7 @@ Item {
                 _current_battery_ARRAY.shift(); //apaga primeiro elemento (ver c/Erich se é pra apagar o primeiro elemento ou todos)
                 _current_generator_ARRAY.shift();
                 //console.log(_current_battery_ARRAY);
+                //console.log(_current_generator_ARRAY);
             }
         }
     }
@@ -313,6 +316,8 @@ Item {
                                console.log(_activeVehicle)
                                    console.log(_activeVehicle.batteries.count)
                                    console.log(_activeVehicle.batteries.get(0).percentRemaining.valueString)
+                                   console.log(_distanceToHome)
+                                   console.log(_distanceToWP)
 
                                }
                            }
