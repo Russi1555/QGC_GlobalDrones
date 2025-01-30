@@ -213,5 +213,6 @@
         <file alias="MotorTemp.svg">resources/motorTemp.svg</file>
         <file alias="RotorsTemp.svg">resources/rotorsTemp.svg</file>
         <file alias="GD25Layout.svg">resources/HexarotorLayout.svg</file>
+        <file alias="GD25.png">resources/GD25_Icon.PNG</file>
     </qresource>
 </RCC>

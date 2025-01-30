@@ -620,7 +620,7 @@ Item {
         width : parent.width - mainViewWidth
         height: mainViewHeight
         //Ilustração Aeronave {EXPERIMENTAR COLOCAR NO FUNDO DO LATERAL VIEW AREA PRA MANTER CENTRALIZAÇÃO HORIZONTAL}
-        /*QGCColoredImage {0
+        QGCColoredImage {
                id: aircraftIcon
                anchors.top:        parent.bottom
                anchors.left:       parent.left
@@ -628,23 +628,66 @@ Item {
                //anchors.margins:    _toolsMargin
                width:              parent.width
                height:             width
-               source:             "/qmlimages/Airframe/HexaRotorX"
+               source:             "/qmlimages/GD25.png"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
                z:1000
                // Add a circle on top of the image
                    Rectangle {
-                       id: circleOverlay
-                       x: parent.width*2/12
+                       x: parent.width*0.195
                        y: parent.height*1/24
-                       width: parent.width*17/64             // Adjust the size of the circle
-                       height: width              // Keep width and height the same for a perfect circle
-                       radius: width / 2       // Make it circular
-                       color:  Qt.rgba(1, 0, 0, 0.5)            // Color of the circle
-                       //anchors.centerIn: parent // Position the circle at the center of the image
-                       z: 1100                 // Ensure it appears above the image
+                       width: parent.width*10/64
+                       height: width
+                       radius: width / 2
+                       color:  Qt.rgba(1, 0, 0, 0.5)
+                       z: 1100
                    }
-            }*/
+                   Rectangle {
+                       x: parent.width*0.635
+                       y: parent.height*1/24
+                       width: parent.width*10/64
+                       height: width
+                       radius: width / 2
+                       color:  Qt.rgba(1, 0, 0, 0.5)
+                       z: 1100
+                   }
+                   Rectangle {
+                       x: parent.width*(-0.025)
+                       y: parent.height*0.425
+                       width: parent.width*10/64
+                       height: width
+                       radius: width / 2
+                       color:  Qt.rgba(1, 0, 0, 0.5)
+                       z: 1100
+                   }
+                   Rectangle {
+                       x: parent.width*0.855
+                       y: parent.height*0.425
+                       width: parent.width*10/64
+                       height: width
+                       radius: width / 2
+                       color:  Qt.rgba(1, 0, 0, 0.5)
+                       z: 1100
+                   }
+                   Rectangle {
+                       x: parent.width*0.195
+                       y: parent.height*0.8
+                       width: parent.width*10/64
+                       height: width
+                       radius: width / 2
+                       color:  Qt.rgba(1, 0, 0, 0.5)
+                       z: 1100
+                   }
+                   Rectangle {
+                       x: parent.width*0.635
+                       y: parent.height*0.8
+                       width: parent.width*10/64
+                       height: width
+                       radius: width / 2
+                       color:  Qt.rgba(1, 0, 0, 0.5)
+                       z: 1100
+                   }
+            }
 
 
         Rectangle {
