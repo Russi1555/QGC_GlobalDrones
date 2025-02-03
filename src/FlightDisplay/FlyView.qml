@@ -102,6 +102,13 @@ Item {
     property real _temperatura_rotor_5: 80 //PLACEHOLDER
     property real _temperatura_rotor_6: 50 //PLACEHOLDER
 
+    property bool _selected_rotor_1: false
+    property bool _selected_rotor_2: false
+    property bool _selected_rotor_3: false
+    property bool _selected_rotor_4: false
+    property bool _selected_rotor_5: false
+    property bool _selected_rotor_6: false
+
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
@@ -318,8 +325,8 @@ Item {
                                    console.log(_activeVehicle.batteries.get(0).percentRemaining.valueString)
                                    console.log(_distanceToHome)
                                    console.log(_distanceToWP)
-
                                }
+
                            }
                        }
                     }
@@ -590,16 +597,35 @@ Item {
                            anchors.bottom: parent.bottom
                            z: parent.z + 1
                            color: "green"
-                           border.color: "black"//index === 0 ? (motor1_selected ? "yellow" : "black") : "black"
+                           border.color: {
+                               if(index == 0 && _selected_rotor_1) return "yellow"
+                               else if (index == 1 && _selected_rotor_2) return "yellow"
+                               else if (index == 2 && _selected_rotor_3) return "yellow"
+                               else if (index == 3 && _selected_rotor_4) return "yellow"
+                               else if (index == 4 && _selected_rotor_5) return "yellow"
+                               else if (index == 5 && _selected_rotor_6) return "yellow"
+                               else return "black"
+                           }//"black"//index === 0 ? (motor1_selected ? "yellow" : "black") : "black"
                            border.width: 3//index === 0 && motor1_selected ? 3 : 1
 
                            MouseArea { // Torna a barra interativa
                                anchors.fill: parent
-                               onClicked: {console.log("Célula", index + 1, "tensão:", model.tensao);
-                               console.log(_activeVehicle)
-                                   console.log(_activeVehicle.batteries.count)
-                                   console.log(_activeVehicle.batteries.get(0).percentRemaining.valueString)
+                               hoverEnabled: true
+                               onClicked: {
+                                    console.log("Célula", index + 1, "tensão:", model.tensao);
+                                    console.log(_activeVehicle)
+                                    console.log(_activeVehicle.batteries.count)
+                                    console.log(_activeVehicle.batteries.get(0).percentRemaining.valueString)
 
+                               }
+
+                               onContainsMouseChanged: {
+                                if(index == 0){_selected_rotor_1 = !_selected_rotor_1 }
+                                else if(index == 1){_selected_rotor_2 = !_selected_rotor_2 }
+                                else if(index == 2){_selected_rotor_3 = !_selected_rotor_3 }
+                                else if(index == 3){_selected_rotor_4 = !_selected_rotor_4 }
+                                else if(index == 4){_selected_rotor_5 = !_selected_rotor_5 }
+                                else if(index == 5){_selected_rotor_6 = !_selected_rotor_6 }
                                }
                            }
                        }
@@ -632,13 +658,14 @@ Item {
                fillMode:           Image.PreserveAspectFit
                color:              "white"
                z:1000
-               // Add a circle on top of the image
                    Rectangle {
                        x: parent.width*0.195
                        y: parent.height*1/24
                        width: parent.width*10/64
                        height: width
                        radius: width / 2
+                       border.width: _selected_rotor_3? 3:1
+                       border.color: _selected_rotor_3? "yellow":"black"
                        color:  Qt.rgba(1, 0, 0, 0.5)
                        z: 1100
                    }
@@ -648,6 +675,8 @@ Item {
                        width: parent.width*10/64
                        height: width
                        radius: width / 2
+                       border.width: _selected_rotor_5? 3:1
+                       border.color: _selected_rotor_5? "yellow":"black"
                        color:  Qt.rgba(1, 0, 0, 0.5)
                        z: 1100
                    }
@@ -657,6 +686,8 @@ Item {
                        width: parent.width*10/64
                        height: width
                        radius: width / 2
+                       border.width: _selected_rotor_2? 3:1
+                       border.color: _selected_rotor_2? "yellow":"black"
                        color:  Qt.rgba(1, 0, 0, 0.5)
                        z: 1100
                    }
@@ -666,6 +697,8 @@ Item {
                        width: parent.width*10/64
                        height: width
                        radius: width / 2
+                       border.width: _selected_rotor_1? 3:1
+                       border.color: _selected_rotor_1? "yellow":"black"
                        color:  Qt.rgba(1, 0, 0, 0.5)
                        z: 1100
                    }
@@ -675,6 +708,8 @@ Item {
                        width: parent.width*10/64
                        height: width
                        radius: width / 2
+                       border.width: _selected_rotor_6? 3:1
+                       border.color: _selected_rotor_6? "yellow":"black"
                        color:  Qt.rgba(1, 0, 0, 0.5)
                        z: 1100
                    }
@@ -684,6 +719,8 @@ Item {
                        width: parent.width*10/64
                        height: width
                        radius: width / 2
+                       border.width: _selected_rotor_4? 3:1
+                       border.color: _selected_rotor_4? "yellow":"black"
                        color:  Qt.rgba(1, 0, 0, 0.5)
                        z: 1100
                    }
