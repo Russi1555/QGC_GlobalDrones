@@ -73,6 +73,7 @@ Item {
     property var _current_bateria: _activeVehicle? 9 : 0
     property var _current_generator: 0
     property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue
+
     property int _satCount: 0
     property int _satPDOP: 0
     property int _rcQuality: 0
@@ -158,6 +159,7 @@ Item {
             _pct_bateria = _activeVehicle.batteries.get(0).percentRemaining.rawValue
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
+            _rcQuality = _activeVehicle.rcRSSI
 
             //Monitoramento do gerador
             _current_battery_ARRAY.push(_current_bateria) //populando dinamicamente array de valores de corrente da bateria
@@ -435,26 +437,50 @@ Item {
                fillMode:           Image.PreserveAspectFit
                color:              "white"
             }
+        OpacityMask{
+            anchors.fill: satteliteInformationIcon
+            source: satteliteInformationIcon
+            maskSource: satteliteInformationIcon
+            MouseArea{
+                id: satMouseArea
+                anchors.fill: parent
+                hoverEnabled : true
 
+            }
+        }
+        Rectangle{
+            id: textBoxSatteliteInfo
+            anchors.verticalCenter: satteliteInformationIcon.verticalCenter
+            anchors.horizontalCenter: satteliteInformationIcon.horizontalCenter
+            height: satteliteInformationIcon.height/2
+            width: satteliteInformationIcon.width
+            visible: satMouseArea.containsMouse? true: false
+            color: "black"
+            border.width: 1
+            border.color: "lightgray"
+        }
         ColumnLayout {
                 id:                     satteliteInfoColumn
-                anchors.top: parent.top
-                anchors.left: satteliteInformationIcon.right
+                anchors.fill: textBoxSatteliteInfo
                 spacing:                0
+                visible: textBoxSatteliteInfo.visible
+
 
                 Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   "Count: " + _satCount
-                    font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    font.bold: true
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
                 Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   "PDOP: "+ _satPDOP
-                    font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    font.bold: true
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
 
             }
@@ -463,46 +489,75 @@ Item {
         QGCColoredImage {
                id: rcInformationIcon
                anchors.top:        parent.top
-               anchors.left:       satteliteInfoColumn.right
+               anchors.left:       satteliteInformationIcon.right
                anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
                source:             "/qmlimages/RC.svg"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
+               visible: false
             }
         Rectangle{
                 id: rcQualityBar
                 anchors.top: parent.top
-                anchors.left: rcInformationIcon.right
+                anchors.left: rcInformationIcon.left
                 anchors.margins: _toolsMargin
-                width: rcInformationIcon.width/3
+                width: rcInformationIcon.width
                 height: parent.height*2/3
                 color: rcMouseArea.containsMouse? "green": "red"
-
-                MouseArea{
-                    id: rcMouseArea
-                    anchors.fill: parent
-                    hoverEnabled : true
-
-                }
+                visible: false
 
                 Rectangle{
                      anchors.top: parent.top
                      anchors.left: parent.left
                      width: parent.width
-                     height: parent.height*(0.3) // dinamico de acordo com 1-(% RC). cor há de ser dinamica também. Ver como pegar esse valor
+                     height: parent.height*(0.2) // dinamico de acordo com 1-(% RC). cor há de ser dinamica também. Ver como pegar esse valor
                      color: "black"
                 }
 
-                Rectangle{
-                    anchors.fill: parent
-                    color: "transparent"
-                    border.width: 2
-                    border.color: "lightgray"
+           }
+
+        OpacityMask{
+            anchors.fill: rcQualityBar
+            source: rcQualityBar
+            maskSource: rcInformationIcon
+            MouseArea{
+                id: rcMouseArea
+                anchors.fill: parent
+                hoverEnabled : true
+
+            }
+    }
+        Rectangle{
+            id: textBoxRCInfo
+            anchors.verticalCenter: rcInformationIcon.verticalCenter
+            anchors.horizontalCenter: rcInformationIcon.horizontalCenter
+            height: satteliteInformationIcon.height/2
+            width: satteliteInformationIcon.width
+            visible: rcMouseArea.containsMouse? true: false
+            color: "black"
+            border.width: 1
+            border.color: "lightgray"
+        }
+        ColumnLayout {
+                id:                     rcInfoColumn
+                anchors.fill: textBoxRCInfo
+                spacing:                0
+                visible: textBoxRCInfo.visible
+
+
+                Text {
+                    Layout.alignment:       Qt.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    color:                  "White"
+                    text:                   "RCSSI: " + _rcQuality
+                    font.bold: true
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
 
-           }
+            }
+
 
         //Temperatura Gerador
         QGCColoredImage {
