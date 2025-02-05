@@ -11,6 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
+import QtQuick.Effects
 
 import QtLocation
 import QtPositioning
@@ -29,6 +30,7 @@ import QGroundControl.Vehicle
 import QGroundControl.FactControls
 // 3D Viewer modules
 import Viewer3D
+import Qt5Compat.GraphicalEffects
 
 Item {
     id: _root
@@ -344,41 +346,68 @@ Item {
                source:             "/qmlimages/GasCan.svg"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
-
+               visible: false
            }
 
         Rectangle{
+            id: gasolineIconColorLevelBackground
+            anchors.fill: gasolinePercentageIcon
+            color: "green"
+            visible: false
+        }
+        Rectangle{
                 id: gasolinePercentageBar
                 anchors.top: gasolinePercentageIcon.top
-                anchors.left: gasolinePercentageIcon.right
+                anchors.left: gasolinePercentageIcon.left
                 //anchors.margins: _toolsMargin
-                width: gasolinePercentageIcon.width/3
-                height: parent.height*2/3
-                color: gasMouseArea.containsMouse? "green": "red"
-
-                MouseArea{
-                    id: gasMouseArea
-                    anchors.fill: parent
-                    hoverEnabled : true
-
-                }
-
-                Rectangle{
+                width: gasolinePercentageIcon.width
+                height: gasolinePercentageIcon.height
+                color: gasMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
+                visible: false
+                Rectangle{ //BARRA DE ALTURA DINAMICA PRA INDICAR O NÍVEL DE GASOLINA -> HEIGHT = 1-GASOLINA%
                      anchors.top: parent.top
                      anchors.left: parent.left
                      width: parent.width
-                     height: parent.height*(0.3) // dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
-                     color: "black"
-                }
-
-                Rectangle{
-                    anchors.fill: parent
-                    color: "transparent"
-                    border.width: 2
-                    border.color: "lightgray"
+                     height: parent.height*(0.3) // _gasolina | dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
+                     color: "black" // possível trocar pra outra cor se o contraste estiver ruim. talvez branco
                 }
 
            }
+        OpacityMask{
+            anchors.fill: gasolinePercentageBar
+            source: gasolinePercentageBar
+            maskSource: gasolinePercentageIcon
+            MouseArea{
+                id: gasMouseArea
+                anchors.fill: parent
+                hoverEnabled : true
+
+            }
+    }
+        Rectangle{
+            id: textBoxGasolinePercentage
+            anchors.verticalCenter: gasolinePercentageIcon.verticalCenter
+            anchors.horizontalCenter: gasolinePercentageIcon.horizontalCenter
+            height: gasolinePercentageIcon.height/4
+            width: gasolinePercentageIcon.width/2
+            visible: gasMouseArea.containsMouse? true: false
+            color: "black"
+            border.width: 1
+            border.color: "lightgray"
+
+        }
+        Text{
+            anchors.fill: textBoxGasolinePercentage
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: "70%" //_gasolina
+            font.bold: true
+            color: "white"
+            visible: textBoxGasolinePercentage.visible
+        }
+
+
+
 
         //operação do gerador (pode ser pop-up por que é fudido de importante?) incluir pop-up/cor dinamica/etc
         QGCColoredImage {
@@ -390,7 +419,7 @@ Item {
                height:             parent.height*2/3
                source:             "/qmlimages/Generator.svg"
                fillMode:           Image.PreserveAspectFit
-               color:              "white"
+               color:              "white" //vai receber o retorno da função. Ou vai estar verde ou vai estar vermelho/laranja. Sem rolo
             }
 
         //satelite https://forest-gis.com/2018/01/acuracia-gps-o-que-sao-pdop-hdop-gdop-multi-caminho-e-outros.html/?srsltid=AfmBOorX7DD9JggA1vLTP2DuhOK44T28jHasCbLA0nv5nSnLX7irYLlW
