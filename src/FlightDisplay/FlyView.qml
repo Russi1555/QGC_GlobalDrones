@@ -208,36 +208,94 @@ Item {
                 source:             "/qmlimages/Battery.svg"
                 fillMode:           Image.PreserveAspectFit
                 color:              "white"
-
-
+                visible: true
             }
 
+        Rectangle{
+                id: batteryPercentageBar
+                anchors.top: batteryPercentageIcon.top
+                anchors.left: batteryPercentageIcon.left
+                //anchors.margins: _toolsMargin
+                width: batteryPercentageIcon.width
+                height: batteryPercentageIcon.height
+                color: "transparent"//batMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
+                visible: false
+                Rectangle{
+                    y: parent.height*0.1
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    //anchors.left: parent.left
+                    width: parent.width/2
+                    height: parent.height*0.85 // _gasolina | dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
+                    color: "green" //cor dinamica de acordo com o _pct_bateria
+                }
+                Rectangle{ //BARRA DE ALTURA DINAMICA PRA INDICAR O NÍVEL DE bateria -> HEIGHT = 1-bateria%
+
+                     anchors.horizontalCenter: parent.horizontalCenter
+                     //anchors.left: parent.left
+                     width: parent.width/2
+                     height: parent.height*(0.3) // _gasolina | dinamico de acordo com 1-(% bateria). cor há de ser dinamica também
+                     color: qgcPal.toolbarBackground
+                }
+
+       }
+
+        OpacityMask{
+            anchors.fill: batteryPercentageBar
+            source: batteryPercentageBar
+            maskSource: batteryPercentageIcon
+            invert: true
+            MouseArea{
+                id: batMouseArea
+                anchors.fill: parent
+                hoverEnabled : true
+
+            }
+        }
+        Rectangle{
+            id: textBoxBatteryInfo
+            anchors.verticalCenter: batteryPercentageIcon .verticalCenter
+            anchors.horizontalCenter: batteryPercentageIcon.horizontalCenter
+            height: batteryPercentageIcon.height/2
+            width: batteryPercentageIcon.width
+            visible: batMouseArea.containsMouse? true: false
+            color: "black"
+            border.width: 1
+            border.color: "lightgray"
+
+        }
         ColumnLayout {
                 id:                     batteryInfoColumn
-                anchors.top: parent.top
-                anchors.left: batteryPercentageIcon.right
+                anchors.verticalCenter: batteryPercentageIcon.verticalCenter
+                anchors.horizontalCenter: batteryPercentageIcon.horizontalCenter
                 spacing:                0
+                visible: textBoxBatteryInfo.visible
 
                 Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   _pct_bateria > 9? _pct_bateria+"%": "0"+_pct_bateria+"%"
-                    font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    visible: textBoxBatteryInfo.visible
+                    font.bold: true
                 }
                 Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   (_tensao_bateria/100) + " V"
-                    font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    visible: textBoxBatteryInfo.visible
+                    font.bold: true
                 }
                 Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   (_current_bateria/100) + " mA"
-                    font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    visible: textBoxBatteryInfo.visible
+                    font.bold: true
                 }
 
             }
@@ -245,7 +303,7 @@ Item {
         Rectangle {
                id: cellsTensionArea
                anchors.top: parent.top
-               anchors.left: batteryInfoColumn.right
+               anchors.left: batteryPercentageIcon.right
                anchors.margins: _toolsMargin * 1.5
                width: height * 2
                height: batteryPercentageIcon.height
@@ -385,7 +443,7 @@ Item {
                 hoverEnabled : true
 
             }
-    }
+        }
         Rectangle{
             id: textBoxGasolinePercentage
             anchors.verticalCenter: gasolinePercentageIcon.verticalCenter
