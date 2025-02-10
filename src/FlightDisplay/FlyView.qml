@@ -98,12 +98,12 @@ Item {
     property real _tensao_cell_11: 40 //PLACEHOLDER
     property real _tensao_cell_12: 90 //PLACEHOLDER
 
-    property real _temperatura_rotor_1: 50 //PLACEHOLDER
-    property real _temperatura_rotor_2: 45 //PLACEHOLDER
-    property real _temperatura_rotor_3: 70 //PLACEHOLDER
-    property real _temperatura_rotor_4: 20 //PLACEHOLDER
-    property real _temperatura_rotor_5: 80 //PLACEHOLDER
-    property real _temperatura_rotor_6: 50 //PLACEHOLDER
+    property real _aceleracao_rotor_1: 50 //PLACEHOLDER
+    property real _aceleracao_rotor_2: 45 //PLACEHOLDER
+    property real _aceleracao_rotor_3: 70 //PLACEHOLDER
+    property real _aceleracao_rotor_4: 20 //PLACEHOLDER
+    property real _aceleracao_rotor_5: 80 //PLACEHOLDER
+    property real _aceleracao_rotor_6: 50 //PLACEHOLDER
 
     property bool _selected_rotor_1: false
     property bool _selected_rotor_2: false
@@ -629,7 +629,55 @@ Item {
                fillMode:           Image.PreserveAspectFit
                color:              "white"
             }
+        QGCColoredImage {
+               id: motorTemperatureInformationIcon2
+               anchors.top:        parent.top
+               anchors.left:       rcQualityBar.right
+               anchors.margins:    _toolsMargin*2
+               width:              height
+               height:             parent.height*2/3
+               source:             "/qmlimages/MotorTermometer.png"
+               fillMode:           Image.PreserveAspectFit
+               color:              "yellow"
+            }
+
         Rectangle{
+            id: textBoxMotorTempInfo
+            anchors.verticalCenter: motorTemperatureInformationIcon.verticalCenter
+            anchors.horizontalCenter: motorTemperatureInformationIcon.horizontalCenter
+            height: motorTemperatureInformationIcon.height/3
+            width: motorTemperatureInformationIcon.width/2
+            visible: motorTempMouseArea.containsMouse? true: false
+            color: "black"
+            border.width: 1
+            border.color: "lightgray"
+
+
+        }
+        MouseArea{
+        id:motorTempMouseArea
+        anchors.fill: motorTemperatureInformationIcon
+        hoverEnabled: true
+        }
+        ColumnLayout {
+                id: motorTempInfoColumn
+                anchors.fill: textBoxMotorTempInfo
+                spacing:                0
+                visible: textBoxMotorTempInfo.visible
+
+
+                Text {
+                    Layout.alignment:       Qt.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    color:                  "White"
+                    text:                   "30° C"
+                    font.bold: true
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                }
+
+            }
+
+        /*Rectangle{
                 id: motorTemperatureBar
                 anchors.top: parent.top
                 anchors.left: motorTemperatureInformationIcon.right
@@ -660,17 +708,18 @@ Item {
                     border.color: "lightgray"
                 }
 
-           }
+           }*/
+
 
         //Temperatura Rotores
         QGCColoredImage {
                id: rotorTemperatureInformationIcon
                anchors.top:        parent.top
-               anchors.left:       motorTemperatureBar.right
+               anchors.left:       motorTemperatureInformationIcon.right
                anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
-               source:             "/qmlimages/RotorsTemp.svg"
+               source:             "/qmlimages/rotorsAccell.png"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
             }
@@ -708,24 +757,24 @@ Item {
 
                    // Popula o modelo com valores dinamicamente
                    Component.onCompleted: {
-                       tempRotorModel.append({ temperatura: _temperatura_rotor_1 });
-                       tempRotorModel.append({ temperatura: _temperatura_rotor_2 });
-                       tempRotorModel.append({ temperatura: _temperatura_rotor_3 });
-                       tempRotorModel.append({ temperatura: _temperatura_rotor_4 });
-                       tempRotorModel.append({ temperatura: _temperatura_rotor_5 });
-                       tempRotorModel.append({ temperatura: _temperatura_rotor_6 });
+                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_1 });
+                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_2 });
+                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_3 });
+                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_4 });
+                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_5 });
+                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_6 });
 
                    }
 
                    Timer{//Atualiza os valores periodicamente [TODO: mudar interval depois]
                         interval: 10000; running: true; repeat: true
                         onTriggered: {
-                        tempRotorModel.set(0, { temperatura: _temperatura_rotor_1 });
-                        tempRotorModel.set(1, { temperatura: _temperatura_rotor_2 });
-                        tempRotorModel.set(2, { temperatura: _temperatura_rotor_3 });
-                        tempRotorModel.set(3, { temperatura: _temperatura_rotor_4 });
-                        tempRotorModel.set(4, { temperatura: _temperatura_rotor_5 });
-                        tempRotorModel.set(5, { temperatura: _temperatura_rotor_6 });
+                        tempRotorModel.set(0, { aceleracao: _aceleracao_rotor_1 });
+                        tempRotorModel.set(1, { aceleracao: _aceleracao_rotor_2 });
+                        tempRotorModel.set(2, { aceleracao: _aceleracao_rotor_3 });
+                        tempRotorModel.set(3, { aceleracao: _aceleracao_rotor_4 });
+                        tempRotorModel.set(4, { aceleracao: _aceleracao_rotor_5 });
+                        tempRotorModel.set(5, { aceleracao: _aceleracao_rotor_6 });
                        }
                     }
 
@@ -734,7 +783,7 @@ Item {
 
                        Rectangle {
                            width: parent.width / 6
-                           height: model.temperatura // Altura proporcional à temperatura
+                           height: model.aceleracao // Altura proporcional à aceleracao
                            x: index * parent.width / 6 // Posiciona horizontalmente
                            anchors.bottom: parent.bottom
                            z: parent.z + 1
