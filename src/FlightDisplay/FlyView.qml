@@ -173,6 +173,8 @@ Item {
                 //console.log(_current_battery_ARRAY);
                 //console.log(_current_generator_ARRAY);
             }
+            //console.log(_pct_bateria)
+            //console.log(_pct_bateria/100)
         }
     }
 
@@ -226,14 +228,14 @@ Item {
                     //anchors.left: parent.left
                     width: parent.width/2
                     height: parent.height*0.85 // _gasolina | dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
-                    color: "green" //cor dinamica de acordo com o _pct_bateria
+                    color: (_pct_bateria) > 50 ? "green" : ((_pct_bateria) > 30 ? "orange" : "red") //cor dinamica de acordo com o _pct_bateria
                 }
                 Rectangle{ //BARRA DE ALTURA DINAMICA PRA INDICAR O NÍVEL DE bateria -> HEIGHT = 1-bateria%
 
                      anchors.horizontalCenter: parent.horizontalCenter
                      //anchors.left: parent.left
                      width: parent.width/2
-                     height: parent.height*(0.2) // _gasolina | dinamico de acordo com 1-(% bateria). cor há de ser dinamica também
+                     height: parent.height*(0.15 + 0.85*(1-_pct_bateria/100) )// _gasolina | dinamico de acordo com 1-(% bateria). cor há de ser dinamica também
                      color: qgcPal.toolbarBackground
                 }
 
