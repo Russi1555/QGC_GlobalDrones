@@ -233,7 +233,7 @@ Item {
                      anchors.horizontalCenter: parent.horizontalCenter
                      //anchors.left: parent.left
                      width: parent.width/2
-                     height: parent.height*(0.3) // _gasolina | dinamico de acordo com 1-(% bateria). cor há de ser dinamica também
+                     height: parent.height*(0.2) // _gasolina | dinamico de acordo com 1-(% bateria). cor há de ser dinamica também
                      color: qgcPal.toolbarBackground
                 }
 
@@ -408,7 +408,16 @@ Item {
                color:              "white"
                visible: false
            }
-
+        DropShadow {
+                anchors.fill: gasolinePercentageIcon
+                source: gasolinePercentageIcon
+                color: "#80000000" // Semi-transparent black shadow
+                radius: 8
+                samples:17
+                spread: 0
+                verticalOffset: 5
+                horizontalOffset: 5
+            }
         Rectangle{
             id: gasolineIconColorLevelBackground
             anchors.fill: gasolinePercentageIcon
@@ -444,6 +453,7 @@ Item {
 
             }
         }
+
         Rectangle{
             id: textBoxGasolinePercentage
             anchors.verticalCenter: gasolinePercentageIcon.verticalCenter
@@ -479,7 +489,18 @@ Item {
                height:             parent.height*2/3
                source:             "/qmlimages/Generator.svg"
                fillMode:           Image.PreserveAspectFit
-               color:              "white" //vai receber o retorno da função. Ou vai estar verde ou vai estar vermelho/laranja. Sem rolo
+               color:              !flagAlertaGerador ? "white" : "orange" //vai receber o retorno da função. Ou vai estar verde ou vai estar vermelho/laranja. Sem rolo
+
+        }
+        DropShadow {
+                anchors.fill: generatorFunctionalityIcon
+                source: generatorFunctionalityIcon
+                color: "#80000000" // Semi-transparent black shadow
+                radius: 8
+                samples:17
+                spread: 0
+                verticalOffset: 5
+                horizontalOffset: 5
             }
 
         //satelite https://forest-gis.com/2018/01/acuracia-gps-o-que-sao-pdop-hdop-gdop-multi-caminho-e-outros.html/?srsltid=AfmBOorX7DD9JggA1vLTP2DuhOK44T28jHasCbLA0nv5nSnLX7irYLlW
@@ -494,6 +515,16 @@ Item {
                source:             "/qmlimages/Gps.svg"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
+            }
+        DropShadow {
+                anchors.fill: satteliteInformationIcon
+                source: satteliteInformationIcon
+                color: "#80000000" // Semi-transparent black shadow
+                radius: 8
+                samples:17
+                spread: 0
+                verticalOffset: 5
+                horizontalOffset: 5
             }
         OpacityMask{
             anchors.fill: satteliteInformationIcon
@@ -556,6 +587,7 @@ Item {
                color:              "white"
                visible: false
             }
+
         Rectangle{
                 id: rcQualityBar
                 anchors.top: parent.top
@@ -677,38 +709,6 @@ Item {
 
             }
 
-        /*Rectangle{
-                id: motorTemperatureBar
-                anchors.top: parent.top
-                anchors.left: motorTemperatureInformationIcon.right
-                anchors.margins: _toolsMargin
-                width: motorTemperatureInformationIcon.width/3
-                height: parent.height*2/3
-                color: motorTemperatureMouseArea.containsMouse? "green": "red"
-
-                MouseArea{
-                    id: motorTemperatureMouseArea
-                    anchors.fill: parent
-                    hoverEnabled : true
-
-                }
-
-                Rectangle{
-                     anchors.top: parent.top
-                     anchors.left: parent.left
-                     width: parent.width
-                     height: parent.height*(0.3) // dinamico de acordo com temperatura do motor (esperar essa informação ficar disponível)
-                     color: "black"
-                }
-
-                Rectangle{
-                    anchors.fill: parent
-                    color: "transparent"
-                    border.width: 2
-                    border.color: "lightgray"
-                }
-
-           }*/
 
 
         //Temperatura Rotores
@@ -848,17 +848,25 @@ Item {
                source:             "/qmlimages/GD25.png"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
-               z:1000
-                   Rectangle {
-                       x: parent.width*0.195
-                       y: parent.height*1/24
-                       width: parent.width*10/64
-                       height: width
-                       radius: width / 2
+
+                   /*Rectangle {
+                       id:rotor1ColorRect
+                       x: parent.width*0.05
+                       y: parent.height*1/15
+                       width: parent.width/2//*10/64
+                       height: width/5
+                       rotation:-30
+                       //radius: width / 2
                        border.width: _selected_rotor_3? 3:1
                        border.color: _selected_rotor_3? "yellow":"black"
                        color:  Qt.rgba(1, 0, 0, 0.5)
                        z: 1100
+                       visible: false
+                   }
+                   ColorOverlay{
+                   anchors.fill:rotor1ColorRect
+                   source:aircraftIcon
+                   color:"green"
                    }
                    Rectangle {
                        x: parent.width*0.635
@@ -914,9 +922,110 @@ Item {
                        border.color: _selected_rotor_4? "yellow":"black"
                        color:  Qt.rgba(1, 0, 0, 0.5)
                        z: 1100
-                   }
+                   }*/
             }
-
+        QGCColoredImage{
+            id:rotor1Mask
+            anchors.fill: aircraftIcon
+            source: "/qmlimages/rotor1mask.png"
+            color: "white"//_selected_rotor_1 ? "yellow" : "white"
+        }
+        DropShadow {
+                anchors.fill: rotor1Mask
+                source: rotor1Mask
+                color: "yellow" // Semi-transparent black shadow
+                radius: 8
+                samples:17
+                spread: 0.4
+                verticalOffset: 0
+                horizontalOffset: 0
+                visible: _selected_rotor_1
+            }
+        QGCColoredImage{
+            id:rotor2Mask
+            anchors.fill: aircraftIcon
+            source: "/qmlimages/rotor2mask.png"
+            color: "white"//_selected_rotor_2 ? "yellow" : "white"
+        }
+        DropShadow {
+                anchors.fill: rotor2Mask
+                source: rotor2Mask
+                color: "yellow" // yellow selected border
+                radius: 8
+                samples:17
+                spread: 0.4
+                verticalOffset: 0
+                horizontalOffset: 0
+                visible: _selected_rotor_2
+            }
+        QGCColoredImage{
+            id:rotor3Mask
+            anchors.fill: aircraftIcon
+            source: "/qmlimages/rotor3mask.png"
+            color: "white"//_selected_rotor_3 ? "yellow" : "white"
+        }
+        DropShadow {
+                anchors.fill: rotor3Mask
+                source: rotor3Mask
+                color: "yellow" // yellow selected border
+                radius: 8
+                samples:17
+                spread: 0.4
+                verticalOffset: 0
+                horizontalOffset: 0
+                visible: _selected_rotor_3
+            }
+        QGCColoredImage{
+            id:rotor4Mask
+            anchors.fill: aircraftIcon
+            source: "/qmlimages/rotor4mask.png"
+            color: "white"//_selected_rotor_4 ? "yellow" : "white"
+        }
+        DropShadow {
+                anchors.fill: rotor4Mask
+                source: rotor4Mask
+                color: "yellow" // yellow selected border
+                radius: 8
+                samples:17
+                spread: 0.4
+                verticalOffset: 0
+                horizontalOffset: 0
+                visible: _selected_rotor_4
+            }
+        QGCColoredImage{
+            id:rotor5Mask
+            anchors.fill: aircraftIcon
+            source: "/qmlimages/rotor5mask.png"
+            color: "white"//_selected_rotor_5 ? "yellow" : "white"
+        }
+        DropShadow {
+                anchors.fill: rotor5Mask
+                source: rotor5Mask
+                color: "yellow" // yellow selected border
+                radius: 8
+                samples:17
+                spread: 0.4
+                verticalOffset: 0
+                horizontalOffset: 0
+                visible: _selected_rotor_5
+            }
+        QGCColoredImage{
+            id:rotor6Mask
+            anchors.fill: aircraftIcon
+            source: "/qmlimages/rotor6mask.png"
+            color: "white"//_selected_rotor_6 ? "yellow" : "white"
+        }
+        DropShadow {
+                anchors.fill: rotor6Mask
+                source: rotor6Mask
+                color: "yellow" // yellow selected border
+                radius: 8
+                samples:17
+                spread: 0.4
+                verticalOffset: 0
+                horizontalOffset: 0
+                visible: _selected_rotor_6
+            }
 
         Rectangle {
                 anchors.fill: parent

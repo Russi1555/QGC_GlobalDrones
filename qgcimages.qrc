@@ -216,5 +216,11 @@
         <file alias="GD25.png">resources/GD25_Icon.PNG</file>
         <file alias="MotorTermometer.png">resources/motorTermometerMask.png</file>
         <file alias="rotorsAccell.png">resources/rotorsAccel.png</file>
+        <file alias="rotor1mask.png">resources/rotor1mask.png</file>
+        <file alias="rotor2mask.png">resources/rotor2mask.png</file>
+        <file alias="rotor6mask.png">resources/rotor6mask.png</file>
+        <file alias="rotor4mask.png">resources/rotor4mask.png</file>
+        <file alias="rotor5mask.png">resources/rotor5mask.png</file>
+        <file alias="rotor3mask.png">resources/rotor3mask.png</file>
     </qresource>
 </RCC>
