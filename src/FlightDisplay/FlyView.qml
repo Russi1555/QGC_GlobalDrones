@@ -150,6 +150,11 @@ Item {
         return [flagAlert, medGer];
     }
 
+    function accelerationPercentageToRadius(percentage){
+        return percentage*0.015
+
+    }
+
     Timer{
         id: propertyValuesUpdater
         interval: 100
@@ -714,7 +719,7 @@ Item {
 
 
         //Temperatura Rotores
-        QGCColoredImage {
+        /*QGCColoredImage {
                id: rotorTemperatureInformationIcon
                anchors.top:        parent.top
                anchors.left:       motorTemperatureInformationIcon.right
@@ -724,8 +729,8 @@ Item {
                source:             "/qmlimages/rotorsAccell.png"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
-            }
-        Rectangle {
+            }*/
+        /*Rectangle {
                id: rotorsTempArea
                anchors.top: parent.top
                anchors.left: rotorTemperatureInformationIcon.right
@@ -826,8 +831,342 @@ Item {
 
            }
 
+        */
+        Item{
+            id: rotor1Accelerometer
+            anchors.left: motorTemperatureInformationIcon.right
+            anchors.top: parent.top
+            anchors.margins:    _toolsMargin*2
+            height: parent.height*2/3
+            width: height
+            visible: true
+            Canvas { //border of
+                anchors.fill: parent
+                id: rotor1Arc
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.clearRect(0, 0, width, height)
+                    ctx.strokeStyle = "gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    var radius = Math.min(width, height) / 2.5
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+
+                    ctx.strokeStyle = "green"//"gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(50)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                }
+            }
+            MouseArea { // Torna o  interativa
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                     console.log("Click Test");
+
+                }
+
+                onContainsMouseChanged: {
+                 _selected_rotor_1 = !_selected_rotor_1
+                }
+            }
+            DropShadow {
+                    anchors.fill: parent
+                    source: rotor1Arc
+                    color: "yellow" // Semi-transparent black shadow
+                    radius: 8
+                    samples:17
+                    spread: 0.4
+                    verticalOffset: 0
+                    horizontalOffset: 0
+                    visible: _selected_rotor_1
+                }
+
+
+            //Component.onCompleted: requestPaint()
+        }
+        Item{
+            id: rotor2Accelerometer
+            anchors.left: rotor1Accelerometer.right
+            anchors.top: parent.top
+            anchors.margins:    _toolsMargin*2
+            height: parent.height*2/3
+            width: height
+            visible: true
+            Canvas { //border of
+                anchors.fill: parent
+                id: rotor2Arc
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.clearRect(0, 0, width, height)
+                    ctx.strokeStyle = "gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    var radius = Math.min(width, height) / 2.5
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+
+                    ctx.strokeStyle = "green"//"gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(60)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                }
+            }
+            MouseArea { // Torna o  interativa
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                     console.log("Click Test");
+
+                }
+
+                onContainsMouseChanged: {
+                 _selected_rotor_2 = !_selected_rotor_2
+                }
+            }
+            DropShadow {
+                    anchors.fill: parent
+                    source: rotor2Arc
+                    color: "yellow" // Semi-transparent black shadow
+                    radius: 8
+                    samples:17
+                    spread: 0.4
+                    verticalOffset: 0
+                    horizontalOffset: 0
+                    visible: _selected_rotor_2
+                }
+            //Component.onCompleted: requestPaint()
+        }
+        Item{
+            id: rotor3Accelerometer
+            anchors.left: rotor2Accelerometer.right
+            anchors.top: parent.top
+            anchors.margins:    _toolsMargin*2
+            height: parent.height*2/3
+            width: height
+            visible: true
+            Canvas { //border of
+                anchors.fill: parent
+                id: rotor3Arc
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.clearRect(0, 0, width, height)
+                    ctx.strokeStyle = "gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    var radius = Math.min(width, height) / 2.5
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+
+                    ctx.strokeStyle = "green"//"gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(15)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                }
+            }
+            MouseArea { // Torna o  interativa
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                     console.log("Click Test");
+
+                }
+
+                onContainsMouseChanged: {
+                 _selected_rotor_3 = !_selected_rotor_3
+                }
+            }
+            DropShadow {
+                    anchors.fill: parent
+                    source: rotor3Arc
+                    color: "yellow" // Semi-transparent black shadow
+                    radius: 8
+                    samples:17
+                    spread: 0.4
+                    verticalOffset: 0
+                    horizontalOffset: 0
+                    visible: _selected_rotor_3
+                }
+            //Component.onCompleted: requestPaint()
+        }
+        Item{
+            id: rotor4Accelerometer
+            anchors.left: rotor3Accelerometer.right
+            anchors.top: parent.top
+            anchors.margins:    _toolsMargin*2
+            height: parent.height*2/3
+            width: height
+            visible: true
+            Canvas { //border of
+                anchors.fill: parent
+                id: rotor4Arc
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.clearRect(0, 0, width, height)
+                    ctx.strokeStyle = "gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    var radius = Math.min(width, height) / 2.5
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+
+                    ctx.strokeStyle = "green"//"gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(30)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                }
+            }
+            MouseArea { // Torna o  interativa
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                     console.log("Click Test");
+
+                }
+
+                onContainsMouseChanged: {
+                 _selected_rotor_4 = !_selected_rotor_4
+                }
+            }
+            DropShadow {
+                    anchors.fill: parent
+                    source: rotor4Arc
+                    color: "yellow" // Semi-transparent black shadow
+                    radius: 8
+                    samples:17
+                    spread: 0.4
+                    verticalOffset: 0
+                    horizontalOffset: 0
+                    visible: _selected_rotor_4
+                }
+            //Component.onCompleted: requestPaint()
+        }
+        Item{
+            id: rotor5Accelerometer
+            anchors.left: rotor4Accelerometer.right
+            anchors.top: parent.top
+            anchors.margins:    _toolsMargin*2
+            height: parent.height*2/3
+            width: height
+            visible: true
+            Canvas { //border of
+                anchors.fill: parent
+                id: rotor5Arc
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.clearRect(0, 0, width, height)
+                    ctx.strokeStyle = "gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    var radius = Math.min(width, height) / 2.5
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+
+                    ctx.strokeStyle = "green"//"gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(74)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                }
+            }
+            MouseArea { // Torna o  interativa
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                     console.log("Click Test");
+
+                }
+
+                onContainsMouseChanged: {
+                 _selected_rotor_5 = !_selected_rotor_5
+                }
+            }
+            DropShadow {
+                    anchors.fill: parent
+                    source: rotor5Arc
+                    color: "yellow" // Semi-transparent black shadow
+                    radius: 8
+                    samples:17
+                    spread: 0.4
+                    verticalOffset: 0
+                    horizontalOffset: 0
+                    visible: _selected_rotor_5
+                }
+            //Component.onCompleted: requestPaint()
+        }
+        Item{
+            id: rotor6Accelerometer
+            anchors.left: rotor5Accelerometer.right
+            anchors.top: parent.top
+            anchors.margins:    _toolsMargin*2
+            height: parent.height*2/3
+            width: height
+            visible: true
+            Canvas { //border of
+                anchors.fill: parent
+                id: rotor6Arc
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.clearRect(0, 0, width, height)
+                    ctx.strokeStyle = "gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    var radius = Math.min(width, height) / 2.5
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+
+                    ctx.strokeStyle = "green"//"gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(95)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                }
+            }
+            MouseArea { // Torna o  interativa
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                     console.log("Click Test");
+
+                }
+
+                onContainsMouseChanged: {
+                 _selected_rotor_6 = !_selected_rotor_6
+                }
+            }
+            DropShadow {
+                    anchors.fill: parent
+                    source: rotor6Arc
+                    color: "yellow" // Semi-transparent black shadow
+                    radius: 8
+                    samples:17
+                    spread: 0.4
+                    verticalOffset: 0
+                    horizontalOffset: 0
+                    visible: _selected_rotor_6
+                }
+            //Component.onCompleted: requestPaint()
+        }
 
     }
+
+
+
 
 //**************************************************************************************************//
 //                          LATERAL VIEW AREA                                                       //
@@ -930,7 +1269,7 @@ Item {
             id:rotor1Mask
             anchors.fill: aircraftIcon
             source: "/qmlimages/rotor1mask.png"
-            color: "white"//_selected_rotor_1 ? "yellow" : "white"
+            color: "white"//_selected_rotor_1 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
         }
         DropShadow {
                 anchors.fill: rotor1Mask
@@ -947,7 +1286,7 @@ Item {
             id:rotor2Mask
             anchors.fill: aircraftIcon
             source: "/qmlimages/rotor2mask.png"
-            color: "white"//_selected_rotor_2 ? "yellow" : "white"
+            color: "white"//_selected_rotor_2 ? "yellow" : "white" //TODO: Mudar isso aqui pra depender da aceleração do rotor
         }
         DropShadow {
                 anchors.fill: rotor2Mask
@@ -964,7 +1303,7 @@ Item {
             id:rotor3Mask
             anchors.fill: aircraftIcon
             source: "/qmlimages/rotor3mask.png"
-            color: "white"//_selected_rotor_3 ? "yellow" : "white"
+            color: "white"//_selected_rotor_3 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
         }
         DropShadow {
                 anchors.fill: rotor3Mask
@@ -981,7 +1320,7 @@ Item {
             id:rotor4Mask
             anchors.fill: aircraftIcon
             source: "/qmlimages/rotor4mask.png"
-            color: "white"//_selected_rotor_4 ? "yellow" : "white"
+            color: "white"//_selected_rotor_4 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
         }
         DropShadow {
                 anchors.fill: rotor4Mask
@@ -998,7 +1337,7 @@ Item {
             id:rotor5Mask
             anchors.fill: aircraftIcon
             source: "/qmlimages/rotor5mask.png"
-            color: "white"//_selected_rotor_5 ? "yellow" : "white"
+            color: "white"//_selected_rotor_5 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
         }
         DropShadow {
                 anchors.fill: rotor5Mask
@@ -1015,7 +1354,7 @@ Item {
             id:rotor6Mask
             anchors.fill: aircraftIcon
             source: "/qmlimages/rotor6mask.png"
-            color: "white"//_selected_rotor_6 ? "yellow" : "white"
+            color: "white"//_selected_rotor_6 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
         }
         DropShadow {
                 anchors.fill: rotor6Mask
@@ -1047,8 +1386,8 @@ Item {
         id: mainViewArea
         anchors.top: parent.top
         anchors.left: parent.left
-        height: mainViewHeight
-        width : mainViewWidth
+        anchors.right: lateralDataArea.left
+        anchors.bottom: bottomDataArea.top
 
         QGCToolInsets {
             id:                     _toolInsets
