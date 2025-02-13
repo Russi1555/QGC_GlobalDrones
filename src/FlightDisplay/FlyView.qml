@@ -82,6 +82,7 @@ Item {
     property var _returnFunctionArray: []
     property bool flagAlertaGerador: false
     property real oldGeneratorMediamValue: 0
+    property int  maxGeneratorCurrent: 120
     property var  _distanceToHome:     _activeVehicle.distanceToHome.rawValue
     property var  _distanceToWP: _activeVehicle.distanceToNextWP.rawValue
 
@@ -98,12 +99,25 @@ Item {
     property real _tensao_cell_11: 40 //PLACEHOLDER
     property real _tensao_cell_12: 90 //PLACEHOLDER
 
-    property real _aceleracao_rotor_1: 50 //PLACEHOLDER
-    property real _aceleracao_rotor_2: 45 //PLACEHOLDER
-    property real _aceleracao_rotor_3: 70 //PLACEHOLDER
-    property real _aceleracao_rotor_4: 20 //PLACEHOLDER
-    property real _aceleracao_rotor_5: 80 //PLACEHOLDER
-    property real _aceleracao_rotor_6: 50 //PLACEHOLDER
+    property real _aceleracao_rotor_1: 1100 //PLACEHOLDER
+    property var  aceleracao_rotor_1_ARRAY: []
+    property real _aceleracao_rotor_2: 1100 //PLACEHOLDER
+    property var  aceleracao_rotor_2_ARRAY: []
+    property real _aceleracao_rotor_3: 1100 //PLACEHOLDER
+    property var  aceleracao_rotor_3_ARRAY: []
+    property real _aceleracao_rotor_4: 1100 //PLACEHOLDER
+    property var  aceleracao_rotor_4_ARRAY: []
+    property real _aceleracao_rotor_5: 1100 //PLACEHOLDER
+    property var  aceleracao_rotor_5_ARRAY: []
+    property real _aceleracao_rotor_6: 1100 //PLACEHOLDER
+    property var  aceleracao_rotor_6_ARRAY: []
+
+    property real medAceleracaoRotor1: 500
+    property real medAceleracaoRotor2: 500
+    property real medAceleracaoRotor3: 500
+    property real medAceleracaoRotor4: 500
+    property real medAceleracaoRotor5: 500
+    property real medAceleracaoRotor6: 500
 
     property bool _selected_rotor_1: false
     property bool _selected_rotor_2: false
@@ -145,6 +159,7 @@ Item {
         //Se a media da corrente da bateria é maior que do gerador E a média do gerador está caindo, levanta flag
         else if (medBat > medGer && oldGerMed > medGer) {
             flagAlert = true;
+            //console.log(medBat,medGer, oldGerMed)
         }
 
         return [flagAlert, medGer];
@@ -157,7 +172,7 @@ Item {
 
     Timer{
         id: propertyValuesUpdater
-        interval: 100
+        interval: 1000
         running: true
         repeat: true
         onTriggered:{
@@ -166,9 +181,31 @@ Item {
             _satPDOP = _activeVehicle.gps.lock.rawValue
             _rcQuality = _activeVehicle.rcRSSI
 
-            //Monitoramento do gerador
-            _current_battery_ARRAY.push(_current_bateria) //populando dinamicamente array de valores de corrente da bateria
-            _current_generator_ARRAY.push(_current_generator)//populando dinamicamente array de valores de corrente do gerador
+            //Monitoramento do gerador TODO: DESCOMENTAR DEPOIS
+            //_current_battery_ARRAY.push(_current_bateria) //populando dinamicamente array de valores de corrente da bateria
+            //_current_generator_ARRAY.push(_current_generator)//populando dinamicamente array de valores de corrente do gerador
+
+            //TODO: DELETAR DEPOIS. APENAS TESTE
+            _current_generator = Math.floor(Math.random() * 120)
+            _current_battery_ARRAY.push(Math.floor(Math.random() * 120))
+            _current_generator_ARRAY.push(_current_generator)
+            _aceleracao_rotor_1 = Math.floor(Math.random()*1000) + 1000
+            aceleracao_rotor_1_ARRAY.push(_aceleracao_rotor_1)
+            _aceleracao_rotor_2 = Math.floor(Math.random()*1000) + 1000
+            aceleracao_rotor_2_ARRAY.push(_aceleracao_rotor_2)
+            _aceleracao_rotor_3 = Math.floor(Math.random()*1000) + 1000
+            aceleracao_rotor_3_ARRAY.push(_aceleracao_rotor_3)
+            _aceleracao_rotor_4 = Math.floor(Math.random()*1000) + 1000
+            aceleracao_rotor_4_ARRAY.push(_aceleracao_rotor_4)
+            _aceleracao_rotor_5 = Math.floor(Math.random()*1000) + 1000
+            aceleracao_rotor_5_ARRAY.push(_aceleracao_rotor_5)
+            _aceleracao_rotor_6 = Math.floor(Math.random()*1000) + 1000
+            aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)
+
+            //AQUI PRA CIMA É SÓ PRA TESTE
+            console.log((oldGeneratorMediamValue/20)/maxGeneratorCurrent, (40/maxGeneratorCurrent))
+
+
             if(_current_generator_ARRAY.length === 20){ //sabendo que recebemos um dado novo a cada 0.1 segundos, (ver c/ Erich)
                 _returnFunctionArray = generatorAlert(_current_battery_ARRAY, _current_generator_ARRAY, oldGeneratorMediamValue);//executa função
                 flagAlertaGerador = _returnFunctionArray[0]; //atualiza flag geral com valor booleano retornado da função
@@ -177,6 +214,14 @@ Item {
                 _current_generator_ARRAY.shift();
                 //console.log(_current_battery_ARRAY);
                 //console.log(_current_generator_ARRAY);
+            }
+            if(aceleracao_rotor_1_ARRAY.lenght ===20){
+                aceleracao_rotor_1_ARRAY.shift();
+                aceleracao_rotor_2_ARRAY.shift();
+                aceleracao_rotor_3_ARRAY.shift();
+                aceleracao_rotor_4_ARRAY.shift();
+                aceleracao_rotor_5_ARRAY.shift();
+                aceleracao_rotor_6_ARRAY.shift();
             }
             //console.log(_pct_bateria)
             //console.log(_pct_bateria/100)
@@ -510,12 +555,48 @@ Item {
                 horizontalOffset: 5
             }
 
+
+
+            Rectangle{
+                //anchors.fill:parent
+                id: generatorCurrentBar
+                anchors.left: generatorFunctionalityIcon.right
+                anchors.top: parent.top
+                anchors.margins: _toolsMargin*2
+                width:height/3
+                height: parent.height*2/3
+                color:"green"
+                //z:1000000
+                Rectangle{
+                    anchors.top:generatorCurrentBar.top
+                    anchors.left:generatorCurrentBar.left
+                    width:generatorCurrentBar.width
+                    height: generatorCurrentBar.height * (1-(_current_generator/maxGeneratorCurrent))
+                    color:"black"
+                }
+                Rectangle{
+                    anchors.fill:parent
+                    border.width:2
+                    border.color: "lightgray"
+                    color:"transparent"
+                }
+                Rectangle{
+                    anchors.horizontalCenter: generatorCurrentBar.horizontalCenter
+                    width: generatorCurrentBar.width + _toolsMargin
+                    height: generatorCurrentBar.height/20
+                    y: generatorCurrentBar.height*(oldGeneratorMediamValue/20)/maxGeneratorCurrent
+                    color: "white"
+                }
+            }
+
+
+
         //satelite https://forest-gis.com/2018/01/acuracia-gps-o-que-sao-pdop-hdop-gdop-multi-caminho-e-outros.html/?srsltid=AfmBOorX7DD9JggA1vLTP2DuhOK44T28jHasCbLA0nv5nSnLX7irYLlW
         //activeVehicle.gps.count.rawValue (NUM SATELITES); _activeVehicle.gps.hdop.rawValue (HDOP); globals.activeVehicle.gps.lock.rawValue (PDOP)
         QGCColoredImage {
                id: satteliteInformationIcon
                anchors.top:        parent.top
-               anchors.left:       generatorFunctionalityIcon.right
+               anchors.left:       generatorCurrentBar.right
                anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
@@ -719,8 +800,8 @@ Item {
 
 
         //Temperatura Rotores
-        /*QGCColoredImage {
-               id: rotorTemperatureInformationIcon
+        QGCColoredImage {
+               id: rotorAccelerationInformationIcon
                anchors.top:        parent.top
                anchors.left:       motorTemperatureInformationIcon.right
                anchors.margins:    _toolsMargin*2
@@ -729,14 +810,14 @@ Item {
                source:             "/qmlimages/rotorsAccell.png"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
-            }*/
-        /*Rectangle {
+            }
+        Rectangle {
                id: rotorsTempArea
                anchors.top: parent.top
-               anchors.left: rotorTemperatureInformationIcon.right
+               anchors.left: rotorAccelerationInformationIcon.right
                anchors.margins: _toolsMargin * 1.5
                width: height * 2
-               height: rotorTemperatureInformationIcon.height
+               height: rotorAccelerationInformationIcon.height
                color: "black" // Background color
 
                // Borda com aparência de aço
@@ -759,38 +840,39 @@ Item {
 
                // Modelo dinâmico com tensões das células
                    ListModel {
-                       id: tempRotorModel
+                       id: accellRotorModel
                    }
 
                    // Popula o modelo com valores dinamicamente
                    Component.onCompleted: {
-                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_1 });
-                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_2 });
-                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_3 });
-                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_4 });
-                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_5 });
-                       tempRotorModel.append({ aceleracao: _aceleracao_rotor_6 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_1 - 1000)/1000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_2 - 1000)/1000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_3 - 1000)/1000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_4 - 1000)/1000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_5 - 1000)/1000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_6 - 1000)/1000 });
 
                    }
 
                    Timer{//Atualiza os valores periodicamente [TODO: mudar interval depois]
-                        interval: 10000; running: true; repeat: true
+                        interval: 1000; running: true; repeat: true
                         onTriggered: {
-                        tempRotorModel.set(0, { aceleracao: _aceleracao_rotor_1 });
-                        tempRotorModel.set(1, { aceleracao: _aceleracao_rotor_2 });
-                        tempRotorModel.set(2, { aceleracao: _aceleracao_rotor_3 });
-                        tempRotorModel.set(3, { aceleracao: _aceleracao_rotor_4 });
-                        tempRotorModel.set(4, { aceleracao: _aceleracao_rotor_5 });
-                        tempRotorModel.set(5, { aceleracao: _aceleracao_rotor_6 });
+                        accellRotorModel.set(0, { aceleracao: (_aceleracao_rotor_1 - 1000)/1000 });
+                        accellRotorModel.set(1, { aceleracao: (_aceleracao_rotor_2 - 1000)/1000 });
+                        accellRotorModel.set(2, { aceleracao: (_aceleracao_rotor_3 - 1000)/1000 });
+                        accellRotorModel.set(3, { aceleracao: (_aceleracao_rotor_4 - 1000)/1000 });
+                        accellRotorModel.set(4, { aceleracao: (_aceleracao_rotor_5 - 1000)/1000 });
+                        accellRotorModel.set(5, { aceleracao: (_aceleracao_rotor_6 - 1000)/1000 });
+                        //console.log((_aceleracao_rotor_1-1000)/1000,_aceleracao_rotor_2,_aceleracao_rotor_3)
                        }
                     }
 
                    Repeater {
-                       model: tempRotorModel
+                       model: accellRotorModel
 
                        Rectangle {
                            width: parent.width / 6
-                           height: model.aceleracao // Altura proporcional à aceleracao
+                           height: model.aceleracao* parent.height // Altura proporcional à aceleracao
                            x: index * parent.width / 6 // Posiciona horizontalmente
                            anchors.bottom: parent.bottom
                            z: parent.z + 1
@@ -826,12 +908,16 @@ Item {
                                 else if(index == 5){_selected_rotor_6 = !_selected_rotor_6 }
                                }
                            }
+
                        }
-                    }
+
+
+                   }
 
            }
 
-        */
+
+        /* Dial Accelerometer
         Item{
             id: rotor1Accelerometer
             anchors.left: motorTemperatureInformationIcon.right
@@ -1162,7 +1248,7 @@ Item {
                 }
             //Component.onCompleted: requestPaint()
         }
-
+        */
     }
 
 

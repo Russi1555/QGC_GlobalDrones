@@ -21,7 +21,7 @@ endif()
 include(Git)
 
 project(QGroundControl
-    VERSION ${QGC_APP_VERSION}
+    VERSION "0.7" #${QGC_APP_VERSION}
     DESCRIPTION ${QGC_APP_DESCRIPTION}
     HOMEPAGE_URL "https://qgroundcontrol.com/"
     LANGUAGES C CXX
