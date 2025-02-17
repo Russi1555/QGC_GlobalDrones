@@ -112,12 +112,12 @@ Item {
     property real _aceleracao_rotor_6: 1100 //PLACEHOLDER
     property var  aceleracao_rotor_6_ARRAY: []
 
-    property real medAceleracaoRotor1: 500
-    property real medAceleracaoRotor2: 500
-    property real medAceleracaoRotor3: 500
-    property real medAceleracaoRotor4: 500
-    property real medAceleracaoRotor5: 500
-    property real medAceleracaoRotor6: 500
+    property real medAceleracaoRotor1: 1500
+    property real medAceleracaoRotor2: 1500
+    property real medAceleracaoRotor3: 1500
+    property real medAceleracaoRotor4: 1500
+    property real medAceleracaoRotor5: 1500
+    property real medAceleracaoRotor6: 1500
 
     property bool _selected_rotor_1: false
     property bool _selected_rotor_2: false
@@ -215,7 +215,29 @@ Item {
                 //console.log(_current_battery_ARRAY);
                 //console.log(_current_generator_ARRAY);
             }
-            if(aceleracao_rotor_1_ARRAY.lenght ===20){
+            if(aceleracao_rotor_1_ARRAY.length ===20){
+                var temp1 = 0;
+                var temp2 = 0;
+                var temp3 = 0;
+                var temp4 = 0;
+                var temp5 = 0;
+                var temp6 = 0;
+                for (var i = 0; i<20; i++){
+                    temp1 = temp1 + aceleracao_rotor_1_ARRAY[i];
+                    temp2 = temp2 + aceleracao_rotor_2_ARRAY[i];
+                    temp3 = temp3 + aceleracao_rotor_3_ARRAY[i];
+                    temp4 = temp4 + aceleracao_rotor_4_ARRAY[i];
+                    temp5 = temp5 + aceleracao_rotor_5_ARRAY[i];
+                    temp6 = temp6 + aceleracao_rotor_6_ARRAY[i];
+                }
+                medAceleracaoRotor1 = temp1/20
+                medAceleracaoRotor2 = temp2/20
+                medAceleracaoRotor3 = temp3/20
+                medAceleracaoRotor4 = temp4/20
+                medAceleracaoRotor5 = temp5/20
+                medAceleracaoRotor6 = temp6/20
+                console.log("medAccell1", medAceleracaoRotor1)
+
                 aceleracao_rotor_1_ARRAY.shift();
                 aceleracao_rotor_2_ARRAY.shift();
                 aceleracao_rotor_3_ARRAY.shift();
@@ -886,8 +908,7 @@ Item {
                                else if (index == 5 && _selected_rotor_6) return "yellow"
                                else return "black"
                            }//"black"//index === 0 ? (motor1_selected ? "yellow" : "black") : "black"
-                           border.width: 3//index === 0 && motor1_selected ? 3 : 1
-
+                        border.width: 3//index === 0 && motor1_selected ? 3 : 1
                            MouseArea { // Torna a barra interativa
                                anchors.fill: parent
                                hoverEnabled: true
@@ -912,6 +933,28 @@ Item {
                        }
 
 
+
+                   }
+
+                   Repeater{
+                   model: accellRotorModel
+                   Rectangle{
+                       width: parent.width/6
+                       height: parent.height/20
+                       y: {
+                           if(index == 0) return parent.height*((medAceleracaoRotor1-1000)/1000)
+                           else if (index == 1) return parent.height*((medAceleracaoRotor2-1000)/1000)
+                           else if (index == 2) return parent.height*((medAceleracaoRotor3-1000)/1000)
+                           else if (index == 3) return parent.height*((medAceleracaoRotor4-1000)/1000)
+                           else if (index == 4) return parent.height*((medAceleracaoRotor5-1000)/1000)
+                           else if (index == 5) return parent.height*((medAceleracaoRotor6-1000)/1000)
+                       }//parent.height*(oldGeneratorMediamValue/20)/maxGeneratorCurrent
+                       x: index*parent.width/6
+                       z:1000
+                       color: "white"
+                       border.color:"black"
+                       border.width:1
+                   }
                    }
 
            }

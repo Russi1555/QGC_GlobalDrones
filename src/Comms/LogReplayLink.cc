@@ -261,7 +261,7 @@ quint64 LogReplayLink::_findLastTimestamp(void)
 bool LogReplayLink::_loadLogFile(void)
 {
     QString errorMsg;
-    QString logFilename = _logReplayConfig->logFilename();
+    QString logFilename = "/home/russi/Downloads/2024-11-14 12-09-48(1).tlog" ;//_logReplayConfig->logFilename();
     QFileInfo logFileInfo;
     int logDurationSecondsTotal;
     quint64 startTimeUSecs;

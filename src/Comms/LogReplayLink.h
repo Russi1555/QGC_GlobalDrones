@@ -31,7 +31,6 @@ public:
 
     QString logFilename(void) { return _logFilename; }
     void setLogFilename(const QString logFilename) { _logFilename = logFilename; emit fileNameChanged(); }
-
     QString logFilenameShort(void);
 
     // Virtuals from LinkConfiguration
