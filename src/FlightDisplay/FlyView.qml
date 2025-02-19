@@ -85,6 +85,8 @@ Item {
     property int  maxGeneratorCurrent: 120
     property var  _distanceToHome:     _activeVehicle.distanceToHome.rawValue
     property var  _distanceToWP: _activeVehicle.distanceToNextWP.rawValue
+    property var _mavlinkLossPercent: _activeVehicle.mavlinkLossPercent.rawValue
+
 
     property real _tensao_cell_1: 50 //PLACEHOLDER
     property real _tensao_cell_2: 45 //PLACEHOLDER
@@ -125,6 +127,8 @@ Item {
     property bool _selected_rotor_4: false
     property bool _selected_rotor_5: false
     property bool _selected_rotor_6: false
+
+    property real _maxVel: _activeVehicle.parameterManager.componentIds()
 
 
     property real   _fullItemZorder:    0
@@ -203,7 +207,13 @@ Item {
             aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)
 
             //AQUI PRA CIMA É SÓ PRA TESTE
-            console.log((oldGeneratorMediamValue/20)/maxGeneratorCurrent, (40/maxGeneratorCurrent))
+           // console.log((oldGeneratorMediamValue/20)/maxGeneratorCurrent, (40/maxGeneratorCurrent))
+            //_mavlinkLossPercent = _activeVehicle.mavlinkLossPercent.rawValue
+
+            console.log("maxvel: ",_maxVel)
+            var params = _activeVehicle.parameterNames(1); // Chama a função C++
+            console.log("Parameters:", params); // Imprime no console do QML
+            params.forEach(param => console.log(param.toString())); //TODO: typeError. QStringList e QString não são reconhecidos pelo QML padrão. Resolver isso depois
 
 
             if(_current_generator_ARRAY.length === 20){ //sabendo que recebemos um dado novo a cada 0.1 segundos, (ver c/ Erich)
@@ -236,7 +246,7 @@ Item {
                 medAceleracaoRotor4 = temp4/20
                 medAceleracaoRotor5 = temp5/20
                 medAceleracaoRotor6 = temp6/20
-                console.log("medAccell1", medAceleracaoRotor1)
+             //   console.log("medAccell1", medAceleracaoRotor1)
 
                 aceleracao_rotor_1_ARRAY.shift();
                 aceleracao_rotor_2_ARRAY.shift();
@@ -712,7 +722,7 @@ Item {
                      anchors.top: parent.top
                      anchors.left: parent.left
                      width: parent.width
-                     height: parent.height*(0.2) // dinamico de acordo com 1-(% RC). cor há de ser dinamica também. Ver como pegar esse valor
+                     height: parent.height*((_rcQuality/255)) // dinamico de acordo com 1-(% RC). cor há de ser dinamica também. Ver como pegar esse valor
                      color: "black"
                 }
 
@@ -755,7 +765,14 @@ Item {
                     font.bold: true
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
-
+                Text {
+                    Layout.alignment:       Qt.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    color:                  "White"
+                    text:                   "pkgs ost: " + _mavlinkLossPercent +"%"
+                    font.bold: true
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                }
             }
 
 
@@ -787,8 +804,8 @@ Item {
             id: textBoxMotorTempInfo
             anchors.verticalCenter: motorTemperatureInformationIcon.verticalCenter
             anchors.horizontalCenter: motorTemperatureInformationIcon.horizontalCenter
-            height: motorTemperatureInformationIcon.height/3
-            width: motorTemperatureInformationIcon.width/2
+            height: motorTemperatureInformationIcon.height/2
+            width: motorTemperatureInformationIcon.width
             visible: motorTempMouseArea.containsMouse? true: false
             color: "black"
             border.width: 1
@@ -813,6 +830,15 @@ Item {
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   "30° C"
+                    font.bold: true
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                }
+
+                Text {
+                    Layout.alignment:       Qt.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    color:                  "White"
+                    text:                   "RPM: 6000"
                     font.bold: true
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
@@ -960,338 +986,6 @@ Item {
            }
 
 
-        /* Dial Accelerometer
-        Item{
-            id: rotor1Accelerometer
-            anchors.left: motorTemperatureInformationIcon.right
-            anchors.top: parent.top
-            anchors.margins:    _toolsMargin*2
-            height: parent.height*2/3
-            width: height
-            visible: true
-            Canvas { //border of
-                anchors.fill: parent
-                id: rotor1Arc
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.clearRect(0, 0, width, height)
-                    ctx.strokeStyle = "gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    var radius = Math.min(width, height) / 2.5
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-
-                    ctx.strokeStyle = "green"//"gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(50)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-                }
-            }
-            MouseArea { // Torna o  interativa
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: {
-                     console.log("Click Test");
-
-                }
-
-                onContainsMouseChanged: {
-                 _selected_rotor_1 = !_selected_rotor_1
-                }
-            }
-            DropShadow {
-                    anchors.fill: parent
-                    source: rotor1Arc
-                    color: "yellow" // Semi-transparent black shadow
-                    radius: 8
-                    samples:17
-                    spread: 0.4
-                    verticalOffset: 0
-                    horizontalOffset: 0
-                    visible: _selected_rotor_1
-                }
-
-
-            //Component.onCompleted: requestPaint()
-        }
-        Item{
-            id: rotor2Accelerometer
-            anchors.left: rotor1Accelerometer.right
-            anchors.top: parent.top
-            anchors.margins:    _toolsMargin*2
-            height: parent.height*2/3
-            width: height
-            visible: true
-            Canvas { //border of
-                anchors.fill: parent
-                id: rotor2Arc
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.clearRect(0, 0, width, height)
-                    ctx.strokeStyle = "gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    var radius = Math.min(width, height) / 2.5
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-
-                    ctx.strokeStyle = "green"//"gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(60)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-                }
-            }
-            MouseArea { // Torna o  interativa
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: {
-                     console.log("Click Test");
-
-                }
-
-                onContainsMouseChanged: {
-                 _selected_rotor_2 = !_selected_rotor_2
-                }
-            }
-            DropShadow {
-                    anchors.fill: parent
-                    source: rotor2Arc
-                    color: "yellow" // Semi-transparent black shadow
-                    radius: 8
-                    samples:17
-                    spread: 0.4
-                    verticalOffset: 0
-                    horizontalOffset: 0
-                    visible: _selected_rotor_2
-                }
-            //Component.onCompleted: requestPaint()
-        }
-        Item{
-            id: rotor3Accelerometer
-            anchors.left: rotor2Accelerometer.right
-            anchors.top: parent.top
-            anchors.margins:    _toolsMargin*2
-            height: parent.height*2/3
-            width: height
-            visible: true
-            Canvas { //border of
-                anchors.fill: parent
-                id: rotor3Arc
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.clearRect(0, 0, width, height)
-                    ctx.strokeStyle = "gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    var radius = Math.min(width, height) / 2.5
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-
-                    ctx.strokeStyle = "green"//"gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(15)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-                }
-            }
-            MouseArea { // Torna o  interativa
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: {
-                     console.log("Click Test");
-
-                }
-
-                onContainsMouseChanged: {
-                 _selected_rotor_3 = !_selected_rotor_3
-                }
-            }
-            DropShadow {
-                    anchors.fill: parent
-                    source: rotor3Arc
-                    color: "yellow" // Semi-transparent black shadow
-                    radius: 8
-                    samples:17
-                    spread: 0.4
-                    verticalOffset: 0
-                    horizontalOffset: 0
-                    visible: _selected_rotor_3
-                }
-            //Component.onCompleted: requestPaint()
-        }
-        Item{
-            id: rotor4Accelerometer
-            anchors.left: rotor3Accelerometer.right
-            anchors.top: parent.top
-            anchors.margins:    _toolsMargin*2
-            height: parent.height*2/3
-            width: height
-            visible: true
-            Canvas { //border of
-                anchors.fill: parent
-                id: rotor4Arc
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.clearRect(0, 0, width, height)
-                    ctx.strokeStyle = "gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    var radius = Math.min(width, height) / 2.5
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-
-                    ctx.strokeStyle = "green"//"gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(30)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-                }
-            }
-            MouseArea { // Torna o  interativa
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: {
-                     console.log("Click Test");
-
-                }
-
-                onContainsMouseChanged: {
-                 _selected_rotor_4 = !_selected_rotor_4
-                }
-            }
-            DropShadow {
-                    anchors.fill: parent
-                    source: rotor4Arc
-                    color: "yellow" // Semi-transparent black shadow
-                    radius: 8
-                    samples:17
-                    spread: 0.4
-                    verticalOffset: 0
-                    horizontalOffset: 0
-                    visible: _selected_rotor_4
-                }
-            //Component.onCompleted: requestPaint()
-        }
-        Item{
-            id: rotor5Accelerometer
-            anchors.left: rotor4Accelerometer.right
-            anchors.top: parent.top
-            anchors.margins:    _toolsMargin*2
-            height: parent.height*2/3
-            width: height
-            visible: true
-            Canvas { //border of
-                anchors.fill: parent
-                id: rotor5Arc
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.clearRect(0, 0, width, height)
-                    ctx.strokeStyle = "gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    var radius = Math.min(width, height) / 2.5
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-
-                    ctx.strokeStyle = "green"//"gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(74)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-                }
-            }
-            MouseArea { // Torna o  interativa
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: {
-                     console.log("Click Test");
-
-                }
-
-                onContainsMouseChanged: {
-                 _selected_rotor_5 = !_selected_rotor_5
-                }
-            }
-            DropShadow {
-                    anchors.fill: parent
-                    source: rotor5Arc
-                    color: "yellow" // Semi-transparent black shadow
-                    radius: 8
-                    samples:17
-                    spread: 0.4
-                    verticalOffset: 0
-                    horizontalOffset: 0
-                    visible: _selected_rotor_5
-                }
-            //Component.onCompleted: requestPaint()
-        }
-        Item{
-            id: rotor6Accelerometer
-            anchors.left: rotor5Accelerometer.right
-            anchors.top: parent.top
-            anchors.margins:    _toolsMargin*2
-            height: parent.height*2/3
-            width: height
-            visible: true
-            Canvas { //border of
-                anchors.fill: parent
-                id: rotor6Arc
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.clearRect(0, 0, width, height)
-                    ctx.strokeStyle = "gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    var radius = Math.min(width, height) / 2.5
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
-                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-
-                    ctx.strokeStyle = "green"//"gray" // Arc color
-                    ctx.lineWidth = 8
-                    ctx.beginPath()
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(95)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
-                    ctx.stroke()
-                }
-            }
-            MouseArea { // Torna o  interativa
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: {
-                     console.log("Click Test");
-
-                }
-
-                onContainsMouseChanged: {
-                 _selected_rotor_6 = !_selected_rotor_6
-                }
-            }
-            DropShadow {
-                    anchors.fill: parent
-                    source: rotor6Arc
-                    color: "yellow" // Semi-transparent black shadow
-                    radius: 8
-                    samples:17
-                    spread: 0.4
-                    verticalOffset: 0
-                    horizontalOffset: 0
-                    visible: _selected_rotor_6
-                }
-            //Component.onCompleted: requestPaint()
-        }
-        */
     }
 
 
@@ -1307,6 +1001,29 @@ Item {
         width : parent.width - mainViewWidth
         height: mainViewHeight
         //Ilustração Aeronave {EXPERIMENTAR COLOCAR NO FUNDO DO LATERAL VIEW AREA PRA MANTER CENTRALIZAÇÃO HORIZONTAL}
+
+        Text {
+                id: minSpeedText
+                text: "Min Speed: 0km/h"
+                anchors.left: parent.left
+                anchors.bottom: maxSpeedText.top
+                anchors.margins: _toolsMargin // Adiciona um pequeno espaço do canto
+                font.bold: true
+                color: "white"
+                z:1000
+            }
+        Text {
+                id: maxSpeedText
+                text: "Max Speed: 61,2km/h"
+                anchors.left: parent.left
+                anchors.bottom: parent.bottom
+                anchors.margins: _toolsMargin // Adiciona um pequeno espaço do canto
+                font.bold: true
+                color: "white"
+                z:1000
+            }
+
+
         QGCColoredImage {
                id: aircraftIcon
                anchors.top:        parent.bottom
