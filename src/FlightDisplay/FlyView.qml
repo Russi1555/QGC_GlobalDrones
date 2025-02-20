@@ -722,7 +722,7 @@ Item {
                      anchors.top: parent.top
                      anchors.left: parent.left
                      width: parent.width
-                     height: parent.height*((_rcQuality/255)) // dinamico de acordo com 1-(% RC). cor há de ser dinamica também. Ver como pegar esse valor
+                     height: parent.height*((0/255)) // dinamico de acordo com 1-(% RC). cor há de ser dinamica também. Ver como pegar esse valor
                      color: "black"
                 }
 
@@ -769,7 +769,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   "pkgs ost: " + _mavlinkLossPercent +"%"
+                    text:                   "pkgs lost: " + _mavlinkLossPercent +"%"
                     font.bold: true
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
@@ -994,13 +994,225 @@ Item {
 //**************************************************************************************************//
 //                          LATERAL VIEW AREA                                                       //
 //**************************************************************************************************//
+    FlyViewToolBar {
+        id:         toolbarsize
+        visible:   false// !QGroundControl.videoManager.fullScreen
+    }
     Item {
         id: lateralDataArea
         anchors.right : parent.right
-        anchors.bottom : lateralDataArea.top
+        anchors.bottom : bottomDataArea.top
+        anchors.top:toolbarsize.bottom
         width : parent.width - mainViewWidth
         height: mainViewHeight
         //Ilustração Aeronave {EXPERIMENTAR COLOCAR NO FUNDO DO LATERAL VIEW AREA PRA MANTER CENTRALIZAÇÃO HORIZONTAL}
+
+        Rectangle {
+                anchors.fill: parent
+                color:qgcPal.toolbarBackground
+                //gradient: Gradient {
+                //    GradientStop { position: 0.7; color:  qgcPal.toolbarBackground} // Top color
+                //    GradientStop { position: 1.0; color:  toolbar._mainStatusBGColor} // Bottom color
+                //}
+            }
+        Item{
+            id: flightTimeArea
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: (parent.height -bottomDataArea.height)/6
+            /*Text {
+                    text: "Flight Time\n 00.00.00"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: maxSpeedText.top
+                    anchors.margins: _toolsMargin // Adiciona um pequeno espaço do canto
+                    font.bold: true
+                    Layout.alignment:       Qt.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    font.pointSize: ScreenTools.smallFontPixelHeight
+                    color: "white"
+                    z:1000
+                }*/
+            ColumnLayout {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing:                0
+                    height: (parent.height -bottomDataArea.height)/6
+
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "Flight Time"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "00.00.00"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+            }
+        }
+        Item{
+            id: dist2HomeArea
+            anchors.top: flightTimeArea.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: (parent.height -bottomDataArea.height)/6
+            ColumnLayout {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing:                0
+                    height: (parent.height -bottomDataArea.height)/6
+
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "Dist. to Home"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "0m"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+            }
+        }
+        Item{
+            id: dist2WaypointArea
+            anchors.top: dist2HomeArea.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: (parent.height -bottomDataArea.height)/6
+            ColumnLayout {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing:                0
+                    height: (parent.height -bottomDataArea.height)/6
+
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "Dist. to WP"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "0m"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+            }
+        }
+        Item{
+            id: altitudeBarometricArea
+            anchors.top: dist2WaypointArea.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: (parent.height -bottomDataArea.height)/6
+            ColumnLayout {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing:                0
+                    height: (parent.height -bottomDataArea.height)/6
+
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "Altitude (AMSL)"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "0m"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+            }
+        }
+        Item{
+            id: horSpeedArea
+            anchors.top: altitudeBarometricArea.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: (parent.height -bottomDataArea.height)/6
+            ColumnLayout {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing:                0
+                    height: (parent.height -bottomDataArea.height)/6
+
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "Hor. speed"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "0m/s"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+            }
+        }
+        Item{
+            id: vertSpeedArea
+            anchors.top: horSpeedArea.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: (parent.height -bottomDataArea.height)/6
+            ColumnLayout {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing:                0
+                    height: (parent.height -bottomDataArea.height)/6
+
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "Vert. speed"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "0m/s"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+            }
+        }
 
         Text {
                 id: minSpeedText
@@ -1214,14 +1426,7 @@ Item {
                 visible: _selected_rotor_6
             }
 
-        Rectangle {
-                anchors.fill: parent
-                color:qgcPal.toolbarBackground
-                //gradient: Gradient {
-                //    GradientStop { position: 0.7; color:  qgcPal.toolbarBackground} // Top color
-                //    GradientStop { position: 1.0; color:  toolbar._mainStatusBGColor} // Bottom color
-                //}
-            }
+
     }
 
 
