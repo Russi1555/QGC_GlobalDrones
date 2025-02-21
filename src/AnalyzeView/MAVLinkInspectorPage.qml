@@ -32,13 +32,15 @@ AnalyzePage {
     property real   maxButtonWidth:     0
 
     property real battery_tension: 0
+    property real gasoline_value: 0
+    property real generator_curr: 0
 
     MAVLinkInspectorController {
         id: controller
     }
 
     Timer {
-        interval: 10000; running: true; repeat: true
+        interval: 1000; running: true; repeat: true
         onTriggered: { //IMPORTANTE: O INDICE DO CURSYSTEM.SELECTED MUDA. TEM QUE FAZER UMA FUNÇÃO PRA VASCULHAR.
 
             //console.log("Teste novo")
@@ -69,12 +71,25 @@ AnalyzePage {
 
                 if (controller.activeSystem.messages.get(i).name ==="POWER_STATUS"){
                     curSystem.selected = i
-                    battery_tension = controller.activeSystem.messages.get(i).fields.get(0).value
-                    console.log(battery_tension)
+                    //battery_tension = controller.activeSystem.messages.get(i).fields.get(0).value
+
                 }
 
                 if (controller.activeSystem.messages.get(i).name === "BATTERY_STATUS"){
                     curSystem.selected = i
+                    var temp_id = controller.activeSystem.messages.get(i).fields.get(0).value
+                    if (temp_id == 0){
+                        battery_tension = controller.activeSystem.messages.get(i).fields.get(4).value.slice(0, 4);
+                        console.log("bat tension: ", battery_tension)
+                    }
+                    if (temp_id == 1){
+                        gasoline_value = controller.activeSystem.messages.get(i).fields.get(4).value.slice(0, 4);
+                        console.log("gasoline: ", gasoline_value)
+                    }
+                    if (temp_id == 2){
+                        generator_curr = controller.activeSystem.messages.get(i).fields.get(5).value.slice(0, 4);
+                        console.log("generator curr: ", generator_curr)
+                    }
                     console.log("ID: ", controller.activeSystem.messages.get(i).fields.get(0).value,controller.activeSystem.messages.get(i).fields.get(4).value)
 
                 }

@@ -69,10 +69,10 @@ Item {
     property real  mainViewWidth : parent.width - (parent.height - mainViewHeight) //garantir simetria
     property bool _cameraExchangeActive : false
     property var _pct_bateria: 0//_activeVehicle.batteries.get(0).percentRemaining.valueString + "%"
-    property var _tensao_bateria: _activeVehicle? 9 : 0
+    property var _tensao_bateria: _activeVehicle? 9 : 0 //modificado em MainWindow
     property var _current_bateria: _activeVehicle? 9 : 0
     property var _current_generator: 0
-    property real _gasolina: _activeVehicle.batteries.get(1).percentRemaining.rawValue
+    property real _gasolina: 0//_activeVehicle.batteries.get(1).voltage
 
     property int _satCount: 0
     property int _satPDOP: 0
@@ -180,7 +180,7 @@ Item {
         running: true
         repeat: true
         onTriggered:{
-            _pct_bateria = _activeVehicle.batteries.get(0).percentRemaining.rawValue
+            _pct_bateria = (((_tensao_bateria/100)/48)*100).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
             _rcQuality = _activeVehicle.rcRSSI
@@ -190,7 +190,7 @@ Item {
             //_current_generator_ARRAY.push(_current_generator)//populando dinamicamente array de valores de corrente do gerador
 
             //TODO: DELETAR DEPOIS. APENAS TESTE
-            _current_generator = Math.floor(Math.random() * 120)
+            //_current_generator = Math.floor(Math.random() * 120)
             _current_battery_ARRAY.push(Math.floor(Math.random() * 120))
             _current_generator_ARRAY.push(_current_generator)
             _aceleracao_rotor_1 = Math.floor(Math.random()*1000) + 1000
@@ -210,10 +210,10 @@ Item {
            // console.log((oldGeneratorMediamValue/20)/maxGeneratorCurrent, (40/maxGeneratorCurrent))
             //_mavlinkLossPercent = _activeVehicle.mavlinkLossPercent.rawValue
 
-            console.log("maxvel: ",_maxVel)
-            var params = _activeVehicle.parameterNames(1); // Chama a função C++
-            console.log("Parameters:", params); // Imprime no console do QML
-            params.forEach(param => console.log(param.toString())); //TODO: typeError. QStringList e QString não são reconhecidos pelo QML padrão. Resolver isso depois
+           // console.log("maxvel: ",_maxVel)
+            //var params = _activeVehicle.parameterNames(1); // Chama a função C++
+            //console.log("Parameters:", params); // Imprime no console do QML
+            //params.forEach(param => console.log(param.toString())); //TODO: typeError. QStringList e QString não são reconhecidos pelo QML padrão. Resolver isso depois
 
 
             if(_current_generator_ARRAY.length === 20){ //sabendo que recebemos um dado novo a cada 0.1 segundos, (ver c/ Erich)
@@ -309,7 +309,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     //anchors.left: parent.left
                     width: parent.width/2
-                    height: parent.height*0.85 // _gasolina | dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
+                    height: parent.height*0.85 //fixo pra não ultrapassar o desenho
                     color: (_pct_bateria) > 50 ? "green" : ((_pct_bateria) > 30 ? "orange" : "red") //cor dinamica de acordo com o _pct_bateria
                 }
                 Rectangle{ //BARRA DE ALTURA DINAMICA PRA INDICAR O NÍVEL DE bateria -> HEIGHT = 1-bateria%
@@ -317,7 +317,7 @@ Item {
                      anchors.horizontalCenter: parent.horizontalCenter
                      //anchors.left: parent.left
                      width: parent.width/2
-                     height: parent.height*(0.15 + 0.85*(1-_pct_bateria/100) )// _gasolina | dinamico de acordo com 1-(% bateria). cor há de ser dinamica também
+                     height: parent.height*(0.15 + 0.85*(1-_pct_bateria/100) )// bateria | dinamico de acordo com 1-(% bateria). cor há de ser dinamica também
                      color: qgcPal.toolbarBackground
                 }
 
@@ -515,13 +515,13 @@ Item {
                 //anchors.margins: _toolsMargin
                 width: gasolinePercentageIcon.width
                 height: gasolinePercentageIcon.height
-                color: gasMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
+                color: _gasolina > 0.50 ? "green" : (_gasolina > 0.2 ? "orange" : "red") //gasMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
                 visible: false
                 Rectangle{ //BARRA DE ALTURA DINAMICA PRA INDICAR O NÍVEL DE GASOLINA -> HEIGHT = 1-GASOLINA%
                      anchors.top: parent.top
                      anchors.left: parent.left
                      width: parent.width
-                     height: parent.height*(0.3) // _gasolina | dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
+                     height: parent.height*(1-_gasolina) // _gasolina | dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
                      color: "black" // possível trocar pra outra cor se o contraste estiver ruim. talvez branco
                 }
 
@@ -554,7 +554,7 @@ Item {
             anchors.fill: textBoxGasolinePercentage
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            text: "70%" //_gasolina
+            text: _gasolina *100 + "%"
             font.bold: true
             color: "white"
             visible: textBoxGasolinePercentage.visible
@@ -618,6 +618,8 @@ Item {
                     height: generatorCurrentBar.height/20
                     y: generatorCurrentBar.height*(oldGeneratorMediamValue/20)/maxGeneratorCurrent
                     color: "white"
+                    border.width:1
+                    border.color:"black"
                 }
             }
 
@@ -1083,7 +1085,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "0m"
+                        text:                   _activeVehicle.distanceToHome.value == "NaN"? 0 : _activeVehicle.distanceToHome.value+"m"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1114,7 +1116,38 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "0m"
+                        text:                   _activeVehicle.distanceToNextWP.value == "NaN"? 0 : _activeVehicle.distanceToNextWP.value+"m"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+            }
+        }
+        Item{
+            id: altitudeRelativeArea
+            anchors.top: dist2WaypointArea.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: (parent.height -bottomDataArea.height)/6
+            ColumnLayout {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    spacing:                0
+                    height: (parent.height -bottomDataArea.height)/6
+
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   "Altitude Relative"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.bold: true
+                    }
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   Math.round(_activeVehicle.altitudeRelative.value*10)/10 + "m"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1122,7 +1155,7 @@ Item {
         }
         Item{
             id: altitudeBarometricArea
-            anchors.top: dist2WaypointArea.bottom
+            anchors.top: altitudeRelativeArea.bottom
             anchors.left: parent.left
             anchors.right: parent.right
             height: (parent.height -bottomDataArea.height)/6
@@ -1145,7 +1178,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "0m"
+                        text:                   Math.round(_activeVehicle.altitudeAMSL.value*10)/10 + "m"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1176,7 +1209,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "0m/s"
+                        text:                   Math.round(_activeVehicle.airSpeed.value*10)/10 +"m/s"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1207,7 +1240,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "0m/s"
+                        text:                   Math.round(_activeVehicle.climbRate.value*10)/10+"m/s"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
