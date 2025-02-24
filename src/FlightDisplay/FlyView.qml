@@ -587,6 +587,18 @@ Item {
                 horizontalOffset: 5
             }
 
+        OpacityMask{
+            anchors.fill: generatorFunctionalityIcon
+            source: generatorFunctionalityIcon
+            maskSource: generatorFunctionalityIcon
+            MouseArea{
+                id: generatorMouseArea
+                anchors.fill: parent
+                hoverEnabled : true
+
+            }
+        }
+
 
 
             Rectangle{
@@ -622,6 +634,35 @@ Item {
                     border.color:"black"
                 }
             }
+
+            Rectangle{
+                id: textBoxGeneratorInfo
+                anchors.verticalCenter: generatorFunctionalityIcon.verticalCenter
+                anchors.horizontalCenter: generatorFunctionalityIcon.horizontalCenter
+                height: generatorFunctionalityIcon.height/2
+                width: generatorFunctionalityIcon.width
+                visible: generatorMouseArea.containsMouse? true: false
+                color: "black"
+                border.width: 1
+                border.color: "lightgray"
+            }
+            ColumnLayout {
+                    id:                     generatorInfoColumn
+                    anchors.fill: textBoxGeneratorInfo
+                    spacing:                0
+                    visible: textBoxGeneratorInfo.visible
+
+
+                    Text {
+                        Layout.alignment:       Qt.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        color:                  "White"
+                        text:                   _current_generator + "A"
+                        font.bold: true
+                        //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    }
+
+                }
 
 
 
