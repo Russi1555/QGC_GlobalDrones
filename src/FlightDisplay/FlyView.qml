@@ -145,7 +145,7 @@ Item {
         toolbar.dropMessageIndicatorTool();
     }
 
-    function generatorAlert(batValues, gerValues, oldGerMed){
+    function generatorAlert(batValues, gerValues, oldGerMed){ //TODO: incluir condicional tensão da bateria < 44V
         var medBat = 0;
         var medGer = 0;
         var flagAlert = false;
@@ -1126,7 +1126,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   _activeVehicle.distanceToHome.value == "NaN"? 0 : _activeVehicle.distanceToHome.value+"m"
+                        text:                   _activeVehicle.distanceToHome.value === "NaN"? 0 : _activeVehicle.distanceToHome.value+"m"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1146,7 +1146,7 @@ Item {
                     height: (parent.height -bottomDataArea.height)/6
 
                     Text {
-                        Layout.alignment:       Qt.AlignHCenter
+                        Layout.alignment:       Qt.AlignHCenterhttps
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Dist. to WP"
