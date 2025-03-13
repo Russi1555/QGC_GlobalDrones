@@ -40,7 +40,7 @@ AnalyzePage {
     }
 
     Timer {
-        interval: 1000; running: true; repeat: true
+        interval: 10000; running: true; repeat: true
         onTriggered: { //IMPORTANTE: O INDICE DO CURSYSTEM.SELECTED MUDA. TEM QUE FAZER UMA FUNÇÃO PRA VASCULHAR.
 
             //console.log("Teste novo")
@@ -80,7 +80,7 @@ AnalyzePage {
                     var temp_id = controller.activeSystem.messages.get(i).fields.get(0).value
                     if (temp_id == 0){
                         battery_tension = controller.activeSystem.messages.get(i).fields.get(4).value.slice(0, 4);
-                        console.log("bat tension: ", battery_tension)
+                        //console.log("bat tension: ", battery_tension)
                     }
                     if (temp_id == 1){
                         gasoline_value = controller.activeSystem.messages.get(i).fields.get(4).value.slice(0, 4);
@@ -88,7 +88,7 @@ AnalyzePage {
                     }
                     if (temp_id == 2){
                         generator_curr = controller.activeSystem.messages.get(i).fields.get(5).value.slice(0, 4);
-                        console.log("generator curr: ", generator_curr)
+                        //console.log("generator curr: ", generator_curr)
                     }
                     console.log("ID: ", controller.activeSystem.messages.get(i).fields.get(0).value,controller.activeSystem.messages.get(i).fields.get(4).value)
 

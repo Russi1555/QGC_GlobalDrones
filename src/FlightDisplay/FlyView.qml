@@ -83,8 +83,8 @@ Item {
     property bool flagAlertaGerador: false
     property real oldGeneratorMediamValue: 0
     property int  maxGeneratorCurrent: 120
-    property var  _distanceToHome:     _activeVehicle.distanceToHome.rawValue
-    property var  _distanceToWP: _activeVehicle.distanceToNextWP.rawValue
+    property var  _distanceToHome:     _activeVehicle.distanceToHome.rawValue.toFixed(2)
+    property var  _distanceToWP: _activeVehicle.distanceToNextWP.rawValue.toFixed(2)
     property var _mavlinkLossPercent: _activeVehicle.mavlinkLossPercent.rawValue
 
 
@@ -180,10 +180,11 @@ Item {
         running: true
         repeat: true
         onTriggered:{
-            _pct_bateria = (((_tensao_bateria/100)/48)*100).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
+            _pct_bateria = (((_tensao_bateria/100)/50)*100).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
             _rcQuality = _activeVehicle.rcRSSI
+
 
             //Monitoramento do gerador TODO: DESCOMENTAR DEPOIS
             //_current_battery_ARRAY.push(_current_bateria) //populando dinamicamente array de valores de corrente da bateria
@@ -1149,7 +1150,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenterhttps
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Dist. to WP"
+                        text:                   " Dist. to WP"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
