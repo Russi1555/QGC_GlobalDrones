@@ -180,10 +180,18 @@ Item {
         running: true
         repeat: true
         onTriggered:{
+            console.log("TESTING BATTERY ACCESS")
+            console.log(_activeVehicle.batteries.count)
+            console.log(_activeVehicle.batteries.get(0).voltage.rawValue)
+            console.log(_activeVehicle.batteries.columnCount())
+            console.log(_activeVehicle.batteries.get(1).voltage.rawValue)
+            //console.log(_activeVehicle.batteries.index(1,0).voltage.rawValue)
             _pct_bateria = (((_tensao_bateria/100)/50)*100).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
             _rcQuality = _activeVehicle.rcRSSI
+            _gasolina = _activeVehicle.batteries.get(1).voltage.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
+            console.log("_gasolina: ",_gasolina)
 
 
             //Monitoramento do gerador TODO: DESCOMENTAR DEPOIS
@@ -1643,7 +1651,7 @@ Item {
             }
 
 
-            FlyViewWidgetLayer {
+            FlyViewWidgetLayer { //Widgets de informações escolhidas
                 id:                     widgetLayer
                 anchors.top:            parent.top
                 anchors.bottom:         parent.bottom

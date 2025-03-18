@@ -52,7 +52,7 @@ ApplicationWindow {
             interval: 10; running: true; repeat: true
             onTriggered: {
             flyView._tensao_bateria = controller4.battery_tension
-            flyView._gasolina = controller4.gasoline_value / 1000
+            //flyView._gasolina = controller4.gasoline_value / 1000
             flyView._current_generator = controller4.generator_curr/100
             }
         }
