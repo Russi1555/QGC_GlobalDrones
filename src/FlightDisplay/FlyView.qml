@@ -72,7 +72,7 @@ Item {
     property var _tensao_bateria: _activeVehicle? 9 : 0 //modificado em MainWindow
     property var _current_bateria: _activeVehicle? 9 : 0
     property var _current_generator: 0
-    property real _gasolina: 0//_activeVehicle.batteries.get(1).voltage
+    property real _gasolina: 50//_activeVehicle.batteries.get(1).voltage
 
     property int _satCount: 0
     property int _satPDOP: 0
@@ -128,6 +128,14 @@ Item {
     property bool _selected_rotor_5: false
     property bool _selected_rotor_6: false
 
+    property int horas_restantes:0
+    property int minutos_restantes:0
+    property int segundos_restantes:0
+
+    property string horas_restantes_string:"00"
+    property string minutos_restantes_string:"00"
+    property string segundos_restantes_string:"00"
+
     property real _maxVel: _activeVehicle.parameterManager.componentIds()
 
 
@@ -176,7 +184,7 @@ Item {
 
     Timer{
         id: propertyValuesUpdater
-        interval: 1000
+        interval: 100
         running: true
         repeat: true
         onTriggered:{
@@ -186,12 +194,32 @@ Item {
             console.log(_activeVehicle.batteries.columnCount())
             console.log(_activeVehicle.batteries.get(1).voltage.rawValue)
             //console.log(_activeVehicle.batteries.index(1,0).voltage.rawValue)
-            _pct_bateria = (((_tensao_bateria/100)/50)*100).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
+
+            _pct_bateria = (((_activeVehicle.batteries.get(0).voltage.rawValue/100)/50)*10000).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
             _rcQuality = _activeVehicle.rcRSSI
-            _gasolina = _activeVehicle.batteries.get(1).voltage.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
+            _gasolina = _activeVehicle.batteries.get(1).percentRemaining.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
+            _current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
+            _current_bateria = _activeVehicle.batteries.get(0).current.rawValue.toFixed(2)
+
+
+            horas_restantes = Math.floor((7200*(_gasolina/100))/3600)
+            minutos_restantes = Math.floor(((7200*(_gasolina/100))%3600)/60)
+            segundos_restantes = (7200 * (_gasolina/100))%60
+
+            if(horas_restantes<10) {horas_restantes_string = "0"+horas_restantes.toString()}
+            else {horas_restantes_string = horas_restantes.toString()}
+            if(minutos_restantes < 10){ minutos_restantes_string = "0" +minutos_restantes.toString()}
+            else {minutos_restantes_string = minutos_restantes.toString()}
+            if(segundos_restantes <10) {segundos_restantes_string = "0" + segundos_restantes.toString()}
+            else {segundos_restantes_string = segundos_restantes.toString()}
+
             console.log("_gasolina: ",_gasolina)
+            console.log(horas_restantes,minutos_restantes,segundos_restantes)
+            batteryInfoColumn.x = 1
+            batteryInfoColumn.x = 0
+            //update()
 
 
             //Monitoramento do gerador TODO: DESCOMENTAR DEPOIS
@@ -200,7 +228,7 @@ Item {
 
             //TODO: DELETAR DEPOIS. APENAS TESTE
             //_current_generator = Math.floor(Math.random() * 120)
-            _current_battery_ARRAY.push(Math.floor(Math.random() * 120))
+           // _current_battery_ARRAY.push(Math.floor(Math.random() * 120))
             _current_generator_ARRAY.push(_current_generator)
             _aceleracao_rotor_1 = Math.floor(Math.random()*1000) + 1000
             aceleracao_rotor_1_ARRAY.push(_aceleracao_rotor_1)
@@ -311,7 +339,7 @@ Item {
                 //anchors.margins: _toolsMargin
                 width: batteryPercentageIcon.width
                 height: batteryPercentageIcon.height
-                color: "transparent"//batMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
+                color: "transparent"//batMouseArea.containsMouse? "green": "red"
                 visible: false
                 Rectangle{
                     y: parent.height*0.1
@@ -347,10 +375,12 @@ Item {
         Rectangle{
             id: textBoxBatteryInfo
             anchors.verticalCenter: batteryPercentageIcon .verticalCenter
-            anchors.horizontalCenter: batteryPercentageIcon.horizontalCenter
+            //anchors.horizontalCenter: batteryPercentageIcon.horizontalCenter
+            anchors.left: batteryPercentageIcon.right
+            anchors.rightMargin: _toolsMargin
             height: batteryPercentageIcon.height/2
             width: batteryPercentageIcon.width
-            visible: batMouseArea.containsMouse? true: false
+            visible: true//batMouseArea.containsMouse? true: false
             color: "black"
             border.width: 1
             border.color: "lightgray"
@@ -358,12 +388,13 @@ Item {
         }
         ColumnLayout {
                 id:                     batteryInfoColumn
-                anchors.verticalCenter: batteryPercentageIcon.verticalCenter
-                anchors.horizontalCenter: batteryPercentageIcon.horizontalCenter
+                anchors.verticalCenter: textBoxBatteryInfo.verticalCenter
+                anchors.horizontalCenter: textBoxBatteryInfo.horizontalCenter
                 spacing:                0
-                visible: textBoxBatteryInfo.visible
+                visible: true//textBoxBatteryInfo.visible
 
                 Text {
+                    id: textBoxBatteryInfoPCT
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
@@ -373,19 +404,21 @@ Item {
                     font.bold: true
                 }
                 Text {
+                    id: textBoxBatteryInfoTENSION
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   (_tensao_bateria/100) + " V"
+                    text:                   (_activeVehicle.batteries.get(0).voltage.rawValue).toFixed(2) + " V"
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
                 Text {
+                    id: textBoxBatteryInfoCURRENT
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   (_current_bateria/100) + " mA"
+                    text:                   (_activeVehicle.batteries.get(0).current.rawValue).toFixed(2) + " mA"
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
@@ -396,7 +429,7 @@ Item {
         Rectangle {
                id: cellsTensionArea
                anchors.top: parent.top
-               anchors.left: batteryPercentageIcon.right
+               anchors.left: textBoxBatteryInfo.right
                anchors.margins: _toolsMargin * 1.5
                width: height * 2
                height: batteryPercentageIcon.height
@@ -524,7 +557,7 @@ Item {
                 //anchors.margins: _toolsMargin
                 width: gasolinePercentageIcon.width
                 height: gasolinePercentageIcon.height
-                color: _gasolina > 0.50 ? "green" : (_gasolina > 0.2 ? "orange" : "red") //gasMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
+                color: _gasolina > 50 ? "green" : (_gasolina > 2 ? "orange" : "red") //gasMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
                 visible: false
                 Rectangle{ //BARRA DE ALTURA DINAMICA PRA INDICAR O NÍVEL DE GASOLINA -> HEIGHT = 1-GASOLINA%
                      anchors.top: parent.top
@@ -553,7 +586,7 @@ Item {
             anchors.horizontalCenter: gasolinePercentageIcon.horizontalCenter
             height: gasolinePercentageIcon.height/4
             width: gasolinePercentageIcon.width/2
-            visible: gasMouseArea.containsMouse? true: false
+            visible: visible//gasMouseArea.containsMouse? true: false
             color: "black"
             border.width: 1
             border.color: "lightgray"
@@ -563,7 +596,7 @@ Item {
             anchors.fill: textBoxGasolinePercentage
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            text: _gasolina *100 + "%"
+            text: _gasolina + "%"
             font.bold: true
             color: "white"
             visible: textBoxGasolinePercentage.visible
@@ -650,7 +683,7 @@ Item {
                 anchors.horizontalCenter: generatorFunctionalityIcon.horizontalCenter
                 height: generatorFunctionalityIcon.height/2
                 width: generatorFunctionalityIcon.width
-                visible: generatorMouseArea.containsMouse? true: false
+                visible: true//generatorMouseArea.containsMouse? true: false
                 color: "black"
                 border.width: 1
                 border.color: "lightgray"
@@ -712,10 +745,12 @@ Item {
         Rectangle{
             id: textBoxSatteliteInfo
             anchors.verticalCenter: satteliteInformationIcon.verticalCenter
-            anchors.horizontalCenter: satteliteInformationIcon.horizontalCenter
+            //anchors.horizontalCenter: satteliteInformationIcon.horizontalCenter
+            anchors.left: satteliteInformationIcon.right
+            anchors.leftMargin: _toolsMargin
             height: satteliteInformationIcon.height/2
             width: satteliteInformationIcon.width
-            visible: satMouseArea.containsMouse? true: false
+            visible: true//satMouseArea.containsMouse? true: false
             color: "black"
             border.width: 1
             border.color: "lightgray"
@@ -750,7 +785,7 @@ Item {
         QGCColoredImage {
                id: rcInformationIcon
                anchors.top:        parent.top
-               anchors.left:       satteliteInformationIcon.right
+               anchors.left:       textBoxSatteliteInfo.right
                anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
@@ -817,14 +852,14 @@ Item {
                     font.bold: true
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
-                Text {
+               /* Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   "pkgs lost: " + _mavlinkLossPercent +"%"
                     font.bold: true
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
-                }
+                }*/
             }
 
 
@@ -1096,7 +1131,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Flight Time"
+                        text:                   "Tempo estimado"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1104,7 +1139,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "00.00.00"
+                        text:                   horas_restantes_string+":"+minutos_restantes_string+":"+segundos_restantes_string
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1135,7 +1170,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   _activeVehicle.distanceToHome.value === "NaN"? 0 : _activeVehicle.distanceToHome.value+"m"
+                        text:                   _activeVehicle.distanceToHome.value === "NaN"? 0 : _activeVehicle.distanceToHome.value.toFixed(2)+"m"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1155,10 +1190,10 @@ Item {
                     height: (parent.height -bottomDataArea.height)/6
 
                     Text {
-                        Layout.alignment:       Qt.AlignHCenterhttps
+                        Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   " Dist. to WP"
+                        text:                   "Dist. to WP"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1189,7 +1224,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Altitude Relative"
+                        text:                   "Alt. Relative"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1220,7 +1255,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Altitude (AMSL)"
+                        text:                   "Alt. AMSL"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
