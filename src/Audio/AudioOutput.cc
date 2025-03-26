@@ -105,8 +105,9 @@ void AudioOutput::read(const QString& text, AudioOutput::TextMods textMods)
         return;
     }
 
-    if (m_textQueueSize > MAX_TEXT_QUEUE_SIZE) {
-        (void) QMetaObject::invokeMethod(this, "stop", Qt::AutoConnection, QTextToSpeech::BoundaryHint::Default);
+    if (m_textQueueSize > static_cast<qsizetype>(MAX_TEXT_QUEUE_SIZE)) {
+
+            QMetaObject::invokeMethod(this, "stop", Qt::AutoConnection, Q_ARG(QTextToSpeech::BoundaryHint, QTextToSpeech::BoundaryHint::Default));
     }
 
     QString outText = AudioOutput::fixTextMessageForAudio(text);

@@ -22,7 +22,7 @@ ADSBTCPLink::ADSBTCPLink(const QString &hostAddress, quint16 port, QObject *pare
 {
     // qCDebug(ADSBTCPLinkLog) << Q_FUNC_INFO << this;
 
-    (void) connect(m_socket, &QTcpSocket::stateChanged, this, [this](QTcpSocket::SocketState state) {
+    (void) connect(m_socket, &QTcpSocket::stateChanged, this, [](QTcpSocket::SocketState state) {
         switch (state) {
             case QTcpSocket::SocketState::UnconnectedState:
                 qCDebug(ADSBTCPLinkLog) << "ADSB Socket disconnected";
