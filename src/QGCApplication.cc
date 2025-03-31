@@ -29,7 +29,7 @@
 #include <QtQml/QQmlApplicationEngine>
 
 #if defined(QGC_GST_STREAMING)
-#include "src/VideoManager/VideoReceiver/GStreamer/GStreamer.h"
+#include "GStreamer.h"
 #endif
 
 #include "QGCConfig.h"

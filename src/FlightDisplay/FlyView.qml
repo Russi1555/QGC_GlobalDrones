@@ -188,11 +188,11 @@ Item {
         running: true
         repeat: true
         onTriggered:{
-            console.log("TESTING BATTERY ACCESS")
+            /*console.log("TESTING BATTERY ACCESS")
             console.log(_activeVehicle.batteries.count)
             console.log(_activeVehicle.batteries.get(0).voltage.rawValue)
             console.log(_activeVehicle.batteries.columnCount())
-            console.log(_activeVehicle.batteries.get(1).voltage.rawValue)
+            console.log(_activeVehicle.batteries.get(1).voltage.rawValue)*/
             //console.log(_activeVehicle.batteries.index(1,0).voltage.rawValue)
 
             _pct_bateria = (((_activeVehicle.batteries.get(0).voltage.rawValue/100)/50)*10000).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
@@ -204,9 +204,11 @@ Item {
             _current_bateria = _activeVehicle.batteries.get(0).current.rawValue.toFixed(2)
 
 
+            //_gasolina = 83
             horas_restantes = Math.floor((7200*(_gasolina/100))/3600)
             minutos_restantes = Math.floor(((7200*(_gasolina/100))%3600)/60)
             segundos_restantes = (7200 * (_gasolina/100))%60
+
 
             if(horas_restantes<10) {horas_restantes_string = "0"+horas_restantes.toString()}
             else {horas_restantes_string = horas_restantes.toString()}
@@ -1131,7 +1133,7 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Tempo estimado"
+                        text:                   "Est. Time"
                         font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
@@ -1176,6 +1178,7 @@ Item {
                     }
             }
         }
+
         Item{
             id: dist2WaypointArea
             anchors.top: dist2HomeArea.bottom

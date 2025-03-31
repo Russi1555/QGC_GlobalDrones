@@ -20,7 +20,7 @@
 #include "VideoReceiver.h"
 
 #if defined(QGC_GST_STREAMING)
-#include "src/VideoManager/VideoReceiver/GStreamer/GStreamer.h"
+#include "GStreamer.h"
 #include "VideoSettings.h"
 #include <QtCore/QDir>
 #else
