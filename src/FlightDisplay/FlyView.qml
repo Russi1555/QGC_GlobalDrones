@@ -390,9 +390,9 @@ Item {
             height: batteryPercentageIcon.height*0.7
             width: batteryPercentageIcon.width
             visible: true//batMouseArea.containsMouse? true: false
-            color: "black"
-            border.width: 1
-            border.color: "lightgray"
+            color: "transparent"// desktop version "black"
+            border.width: 0
+            border.color: "transparent"// desktop version "lightgray"
 
         }
         ColumnLayout {
@@ -408,7 +408,7 @@ Item {
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   _pct_bateria > 9? _pct_bateria+"%": "0"+_pct_bateria+"%"
-                //    font.pointSize:         //ScreenTools.mediumFontPixelHeight
+                   font.pixelSize:         13//ScreenTools.smallFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
@@ -418,7 +418,7 @@ Item {
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   (_activeVehicle.batteries.get(0).voltage.rawValue).toFixed(2) + " V"
-                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    font.pixelSize:         13//ScreenTools.smallFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
@@ -428,7 +428,7 @@ Item {
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   (_activeVehicle.batteries.get(0).current.rawValue).toFixed(2) + " mA"
-                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    font.pixelSize:         13//ScreenTools.smallFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
@@ -593,8 +593,8 @@ Item {
             id: textBoxGasolinePercentage
             anchors.verticalCenter: gasolinePercentageIcon.verticalCenter
             anchors.horizontalCenter: gasolinePercentageIcon.horizontalCenter
-            height: gasolinePercentageIcon.height/4
-            width: gasolinePercentageIcon.width/2
+            height: gasolinePercentageIcon.height/3
+            width: gasolinePercentageIcon.width
             visible: visible//gasMouseArea.containsMouse? true: false
             color: "black"
             border.width: 1
@@ -763,9 +763,9 @@ Item {
             height: satteliteInformationIcon.height*0.7
             width: satteliteInformationIcon.width
             visible: true//satMouseArea.containsMouse? true: false
-            color: "black"
-            border.width: 1
-            border.color: "lightgray"
+            color: "transparent" // desktop "black"
+            border.width: 0// 1
+            border.color: "transparent"// desktop "lightgray"
         }
         ColumnLayout {
                 id:                     satteliteInfoColumn
@@ -1156,7 +1156,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Est. Time"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1164,7 +1164,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   horas_restantes_string+":"+minutos_restantes_string+":"+segundos_restantes_string
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1186,8 +1186,8 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Dist. to Home"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        text:                   "Dist. Home"
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1195,7 +1195,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   _activeVehicle.distanceToHome.value === "NaN"? 0 : _activeVehicle.distanceToHome.value.toFixed(2)+"m"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1218,8 +1218,8 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Dist. to WP"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        text:                   "Dist. WP"
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1227,7 +1227,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   _activeVehicle.distanceToNextWP.value == "NaN"? 0 : _activeVehicle.distanceToNextWP.value+"m"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1249,16 +1249,16 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Alt. Relative"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        text:                   "Alt. LIDAR"
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   Math.round(_activeVehicle.altitudeRelative.value*10)/10 + "m"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        text:                   _activeVehicle.rangeFinderDist.value.toFixed(2) + "m" //altitudeRelative.value*10)/10 + "m"
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1281,7 +1281,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Alt. AMSL"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1289,7 +1289,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   Math.round(_activeVehicle.altitudeAMSL.value*10)/10 + "m"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1312,7 +1312,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Hor. speed"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1320,7 +1320,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   Math.round(_activeVehicle.airSpeed.value*10)/10 +"m/s"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1343,7 +1343,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Vert. speed"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1351,7 +1351,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   Math.round(_activeVehicle.climbRate.value*10)/10+"m/s"
-                        font.pointSize:         ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1364,7 +1364,7 @@ Item {
                 anchors.bottom: maxSpeedText.top
                 anchors.margins: _toolsMargin // Adiciona um pequeno espaço do canto
                 font.bold: true
-                font.pixelSize: 5
+                font.pixelSize: 7
                 color: "white"
                 z:1000
             }
@@ -1375,7 +1375,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.margins: _toolsMargin // Adiciona um pequeno espaço do canto
                 font.bold: true
-                font.pixelSize: 5
+                font.pixelSize: 7
                 color: "white"
                 z:1000
             }
