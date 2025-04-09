@@ -136,16 +136,11 @@ Item {
     property string minutos_restantes_string:"00"
     property string segundos_restantes_string:"00"
 
-    property bool _androidBuild: (Qt.platform.os === "ios" || Qt.platform.os === "android")
-
     property real _maxVel: _activeVehicle.parameterManager.componentIds()
 
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
-
-    property var res_x: parent.width
-    property var res_y: parent.height
 
 
 
@@ -205,15 +200,14 @@ Item {
             _satPDOP = _activeVehicle.gps.lock.rawValue
             _rcQuality = _activeVehicle.rcRSSI.rawValue
             _gasolina = _activeVehicle.batteries.get(1).percentRemaining.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
-            //_current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
+            _current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
             _current_bateria = _activeVehicle.batteries.get(0).current.rawValue.toFixed(2)
 
 
-            //_gasolina = 15
+            //_gasolina = 83
             horas_restantes = Math.floor((7200*(_gasolina/100))/3600)
             minutos_restantes = Math.floor(((7200*(_gasolina/100))%3600)/60)
             segundos_restantes = (7200 * (_gasolina/100))%60
-
 
 
             if(horas_restantes<10) {horas_restantes_string = "0"+horas_restantes.toString()}
@@ -225,7 +219,6 @@ Item {
 
             console.log("_gasolina: ",_gasolina)
             console.log(horas_restantes,minutos_restantes,segundos_restantes)
-            console.log(res_x, res_y)
             batteryInfoColumn.x = 1
             batteryInfoColumn.x = 0
             //update()
@@ -387,17 +380,17 @@ Item {
             //anchors.horizontalCenter: batteryPercentageIcon.horizontalCenter
             anchors.left: batteryPercentageIcon.right
             anchors.rightMargin: _toolsMargin
-            height: batteryPercentageIcon.height*0.7
+            height: batteryPercentageIcon.height/2
             width: batteryPercentageIcon.width
             visible: true//batMouseArea.containsMouse? true: false
-            color: "transparent"// desktop version "black"
-            border.width: 0
-            border.color: "transparent"// desktop version "lightgray"
+            color: "black"
+            border.width: 1
+            border.color: "lightgray"
 
         }
         ColumnLayout {
                 id:                     batteryInfoColumn
-                anchors.top: textBoxBatteryInfo.top
+                anchors.verticalCenter: textBoxBatteryInfo.verticalCenter
                 anchors.horizontalCenter: textBoxBatteryInfo.horizontalCenter
                 spacing:                0
                 visible: true//textBoxBatteryInfo.visible
@@ -408,7 +401,7 @@ Item {
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   _pct_bateria > 9? _pct_bateria+"%": "0"+_pct_bateria+"%"
-                   font.pixelSize:         13//ScreenTools.smallFontPixelHeight
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
@@ -418,7 +411,7 @@ Item {
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   (_activeVehicle.batteries.get(0).voltage.rawValue).toFixed(2) + " V"
-                    font.pixelSize:         13//ScreenTools.smallFontPixelHeight
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
@@ -428,14 +421,14 @@ Item {
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   (_activeVehicle.batteries.get(0).current.rawValue).toFixed(2) + " mA"
-                    font.pixelSize:         13//ScreenTools.smallFontPixelHeight
+                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
 
             }
-/*
-        Rectangle {
+
+      /*  Rectangle {
                id: cellsTensionArea
                anchors.top: parent.top
                anchors.left: textBoxBatteryInfo.right
@@ -534,7 +527,7 @@ Item {
         QGCColoredImage {
                id: gasolinePercentageIcon
                anchors.top:        parent.top
-               anchors.left:       batteryInfoColumn.right
+               anchors.left:       textBoxBatteryInfo.right
                anchors.margins:    _toolsMargin
                width:              height
                height:             parent.height*2/3
@@ -566,7 +559,7 @@ Item {
                 //anchors.margins: _toolsMargin
                 width: gasolinePercentageIcon.width
                 height: gasolinePercentageIcon.height
-                color: _gasolina > 50 ? "green" : (_gasolina > 20 ? "orange" : "red") //gasMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
+                color: _gasolina > 50 ? "green" : (_gasolina > 2 ? "orange" : "red") //gasMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
                 visible: false
                 Rectangle{ //BARRA DE ALTURA DINAMICA PRA INDICAR O NÍVEL DE GASOLINA -> HEIGHT = 1-GASOLINA%
                      anchors.top: parent.top
@@ -593,8 +586,8 @@ Item {
             id: textBoxGasolinePercentage
             anchors.verticalCenter: gasolinePercentageIcon.verticalCenter
             anchors.horizontalCenter: gasolinePercentageIcon.horizontalCenter
-            height: gasolinePercentageIcon.height/3
-            width: gasolinePercentageIcon.width
+            height: gasolinePercentageIcon.height/4
+            width: gasolinePercentageIcon.width/2
             visible: visible//gasMouseArea.containsMouse? true: false
             color: "black"
             border.width: 1
@@ -619,8 +612,7 @@ Item {
                id: generatorFunctionalityIcon
                anchors.top:        parent.top
                anchors.left:       gasolinePercentageBar.right
-               anchors.leftMargin: _toolsMargin*2
-               anchors.topMargin:  _toolsMargin*2
+               anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
                source:             "/qmlimages/Generator.svg"
@@ -658,8 +650,7 @@ Item {
                 id: generatorCurrentBar
                 anchors.left: generatorFunctionalityIcon.right
                 anchors.top: parent.top
-                anchors.leftMargin: _toolsMargin*2
-                anchors.topMargin:  _toolsMargin*2
+                anchors.margins: _toolsMargin*2
                 width:height/3
                 height: parent.height*2/3
                 color:"green"
@@ -725,13 +716,12 @@ Item {
                id: satteliteInformationIcon
                anchors.top:        parent.top
                anchors.left:       generatorCurrentBar.right
-               anchors.leftMargin: _toolsMargin
-               anchors.topMargin:  _toolsMargin*2
+               anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
                source:             "/qmlimages/Gps.svg"
                fillMode:           Image.PreserveAspectFit
-               color:              _satPDOP >= 2 && _satCount >=6 ? "green": "orange"
+               color:              "white"
             }
         DropShadow {
                 anchors.fill: satteliteInformationIcon
@@ -760,12 +750,12 @@ Item {
             //anchors.horizontalCenter: satteliteInformationIcon.horizontalCenter
             anchors.left: satteliteInformationIcon.right
             anchors.leftMargin: _toolsMargin
-            height: satteliteInformationIcon.height*0.7
+            height: satteliteInformationIcon.height/2
             width: satteliteInformationIcon.width
             visible: true//satMouseArea.containsMouse? true: false
-            color: "transparent" // desktop "black"
-            border.width: 0// 1
-            border.color: "transparent"// desktop "lightgray"
+            color: "black"
+            border.width: 1
+            border.color: "lightgray"
         }
         ColumnLayout {
                 id:                     satteliteInfoColumn
@@ -798,13 +788,12 @@ Item {
                id: rcInformationIcon
                anchors.top:        parent.top
                anchors.left:       textBoxSatteliteInfo.right
-               //anchors.leftMargin: _toolsMargin
-               anchors.topMargin:  _toolsMargin*2
+               anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
                source:             "/qmlimages/RC.svg"
                fillMode:           Image.PreserveAspectFit
-               color:           _rcQuality > 90 ? "green" : (_rcQuality>=80? "yellow": (_rcQuality >= 70 ? "orange":"red"))
+               color:              "white"
                visible: false
             }
 
@@ -815,7 +804,7 @@ Item {
                 anchors.margins: _toolsMargin
                 width: rcInformationIcon.width
                 height: parent.height*2/3
-                color: _rcQuality > 90 ? "green" : (_rcQuality>=80? "yellow": (_rcQuality >= 70 ? "orange":"red"))//rcMouseArea.containsMouse? "green": "red"
+                color: rcMouseArea.containsMouse? "green": "red"
                 visible: false
 
                 Rectangle{
@@ -836,11 +825,6 @@ Item {
                 id: rcMouseArea
                 anchors.fill: parent
                 hoverEnabled : true
-                onClicked: {
-                            if (_androidBuild) {
-                                textBoxRCInfo.visible = !textBoxRCInfo.visible;
-                            }
-                }
 
             }
     }
@@ -848,9 +832,9 @@ Item {
             id: textBoxRCInfo
             anchors.verticalCenter: rcInformationIcon.verticalCenter
             anchors.horizontalCenter: rcInformationIcon.horizontalCenter
-            height: satteliteInformationIcon.height*0.7
+            height: satteliteInformationIcon.height/2
             width: satteliteInformationIcon.width
-            visible: _androidBuild ? false : rcMouseArea.containsMouse
+            visible: rcMouseArea.containsMouse? true: false
             color: "black"
             border.width: 1
             border.color: "lightgray"
@@ -866,7 +850,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   _rcQuality + "%"
+                    text:                   "RCSSI: " + _rcQuality
                     font.bold: true
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
@@ -886,7 +870,7 @@ Item {
                id: motorTemperatureInformationIcon
                anchors.top:        parent.top
                anchors.left:       rcQualityBar.right
-               anchors.topMargin:  _toolsMargin*2
+               anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
                source:             "/qmlimages/MotorTemp.svg"
@@ -897,7 +881,7 @@ Item {
                id: motorTemperatureInformationIcon2
                anchors.top:        parent.top
                anchors.left:       rcQualityBar.right
-               anchors.topMargin:  _toolsMargin*2
+               anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
                source:             "/qmlimages/MotorTermometer.png"
@@ -909,9 +893,9 @@ Item {
             id: textBoxMotorTempInfo
             anchors.verticalCenter: motorTemperatureInformationIcon.verticalCenter
             anchors.horizontalCenter: motorTemperatureInformationIcon.horizontalCenter
-            height: motorTemperatureInformationIcon.height*0.7
+            height: motorTemperatureInformationIcon.height/2
             width: motorTemperatureInformationIcon.width
-            visible:  _androidBuild ? false : motorTempMouseArea.containsMouse//motorTempMouseArea.containsMouse? true: false
+            visible: motorTempMouseArea.containsMouse? true: false
             color: "black"
             border.width: 1
             border.color: "lightgray"
@@ -922,11 +906,6 @@ Item {
         id:motorTempMouseArea
         anchors.fill: motorTemperatureInformationIcon
         hoverEnabled: true
-        onClicked: {
-                    if (_androidBuild) {
-                        textBoxMotorTempInfo.visible = !textBoxMotorTempInfo.visible;
-                    }
-        }
         }
         ColumnLayout {
                 id: motorTempInfoColumn
@@ -962,8 +941,7 @@ Item {
                id: rotorAccelerationInformationIcon
                anchors.top:        parent.top
                anchors.left:       motorTemperatureInformationIcon.right
-               anchors.leftMargin: _toolsMargin
-               anchors.topMargin:  _toolsMargin*2
+               anchors.margins:    _toolsMargin*2
                width:              height
                height:             parent.height*2/3
                source:             "/qmlimages/rotorsAccell.png"
@@ -1156,7 +1134,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Est. Time"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1164,7 +1142,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   horas_restantes_string+":"+minutos_restantes_string+":"+segundos_restantes_string
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1186,8 +1164,8 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Dist. Home"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        text:                   "Dist. to Home"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1195,7 +1173,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   _activeVehicle.distanceToHome.value === "NaN"? 0 : _activeVehicle.distanceToHome.value.toFixed(2)+"m"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1218,8 +1196,8 @@ Item {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   "Dist. WP"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        text:                   "Dist. to WP"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1227,7 +1205,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   _activeVehicle.distanceToNextWP.value == "NaN"? 0 : _activeVehicle.distanceToNextWP.value+"m"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1250,15 +1228,15 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Alt. LIDAR"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
-                        text:                   _activeVehicle.rangeFinderDist.value.toFixed(2) + "m" //altitudeRelative.value*10)/10 + "m"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        text:                   (_activeVehicle.rangeFinderDist.rawValue).toFixed(3) + "m"
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1281,7 +1259,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Alt. AMSL"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1289,7 +1267,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   Math.round(_activeVehicle.altitudeAMSL.value*10)/10 + "m"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1312,7 +1290,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Hor. speed"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1320,7 +1298,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   Math.round(_activeVehicle.airSpeed.value*10)/10 +"m/s"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1343,7 +1321,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Vert. speed"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1351,7 +1329,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   Math.round(_activeVehicle.climbRate.value*10)/10+"m/s"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pointSize:         ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1364,7 +1342,6 @@ Item {
                 anchors.bottom: maxSpeedText.top
                 anchors.margins: _toolsMargin // Adiciona um pequeno espaço do canto
                 font.bold: true
-                font.pixelSize: 7
                 color: "white"
                 z:1000
             }
@@ -1375,7 +1352,6 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.margins: _toolsMargin // Adiciona um pequeno espaço do canto
                 font.bold: true
-                font.pixelSize: 7
                 color: "white"
                 z:1000
             }
@@ -1620,13 +1596,13 @@ Item {
             FlyViewVideo {
                 id:         videoControl
                 pipView:    _pipView
-                /*Rectangle{ //exemplo interface maximizada
+                Rectangle{ //exemplo interface maximizada
                     x:0
                     y:0
                     width: 50
                     height:50
-                    color: _androidBuild? "red" : "blue"
-                }*/
+                    color: "transparent"//_mainWindowIsMap? "yellow" : "green"
+                }
             }
 
             PipView {
