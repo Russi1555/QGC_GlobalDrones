@@ -140,11 +140,18 @@ Rectangle {
             }
         }
     }
-
+    Rectangle{
+        color:"black"
+        border.width:1
+        border.color:"lightgrey"
+        anchors.fill: heading_text
+    }
     QGCLabel {
+        id: heading_text
         anchors.horizontalCenter:   parent.horizontalCenter
         y:                          size * 0.74
         text:                       vehicle ? _heading.toFixed(0) + "°" : ""
         horizontalAlignment:        Text.AlignHCenter
     }
+
 }
