@@ -69,8 +69,8 @@ Item {
     property real  mainViewWidth : parent.width - (parent.height - mainViewHeight) //garantir simetria
     property bool _cameraExchangeActive : false
     property var _pct_bateria: 0//_activeVehicle.batteries.get(0).percentRemaining.valueString + "%"
-    property var _tensao_bateria: _activeVehicle? 9 : 0 //modificado em MainWindow
-    property var _current_bateria: _activeVehicle? 9 : 0
+    property var _tensao_bateria:  0 //modificado em MainWindow
+    property var _current_bateria:  0
     property var _current_generator: 0
     property real _gasolina: 50//_activeVehicle.batteries.get(1).voltage
 
@@ -201,6 +201,9 @@ Item {
             //console.log(_activeVehicle.batteries.index(1,0).voltage.rawValue)
 
             _pct_bateria = (((_activeVehicle.batteries.get(0).voltage.rawValue/100)/50)*10000).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
+            _tensao_bateria = (_activeVehicle.batteries.get(0).voltage.rawValue).toFixed(2)
+            _current_bateria = (_activeVehicle.batteries.get(0).current.rawValue).toFixed(2)
+            _current_bateria =
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
             _rcQuality = _activeVehicle.rcRSSI.rawValue
@@ -312,7 +315,7 @@ Item {
     Item {
         id: bottomDataArea
         anchors.bottom : parent.bottom
-        anchors.left : parent.bottom
+        anchors.left : parent.left
         width : parent.width
         height: parent.height - mainViewHeight
 
@@ -417,7 +420,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   (_activeVehicle.batteries.get(0).voltage.rawValue).toFixed(2) + " V"
+                    text:                   _tensao_bateria + " V"
                     font.pixelSize:         13//ScreenTools.smallFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
@@ -427,7 +430,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   (_activeVehicle.batteries.get(0).current.rawValue).toFixed(2) + " mA"
+                    text:                   _current_bateria + " mA"
                     font.pixelSize:         13//ScreenTools.smallFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
