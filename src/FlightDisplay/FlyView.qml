@@ -192,6 +192,7 @@ Item {
         interval: 100
         running: true
         repeat: true
+
         onTriggered:{
             /*console.log("TESTING BATTERY ACCESS")
             console.log(_activeVehicle.batteries.count)
@@ -229,8 +230,7 @@ Item {
             console.log("_gasolina: ",_gasolina)
             console.log(horas_restantes,minutos_restantes,segundos_restantes)
             console.log(res_x, res_y)
-            batteryInfoColumn.x = 1
-            batteryInfoColumn.x = 0
+
             //update()
 
 
@@ -309,15 +309,30 @@ Item {
         }
     }
 
+
     //**************************************************************************************************//
     //                          BOTTOM VIEW AREA                                                        //
     //**************************************************************************************************//
-    Item {
+    Loader{
+        id: bottomDataLoader
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            width: parent.width
+            height: parent.height - mainViewHeight
+            active: true  // or false if you want to delay loading
+            asynchronous: true
+            onLoaded: {let now = new Date();
+                console.log("bottomDataArea LOADED at " + now.toLocaleTimeString());}
+            sourceComponent: Component {
+                    id: bottomDataComponent
+                Item {
         id: bottomDataArea
         anchors.bottom : parent.bottom
         anchors.left : parent.left
         width : parent.width
-        height: parent.height - mainViewHeight
+        height: parent.height
+
+
 
 
 
@@ -396,6 +411,7 @@ Item {
             color: "transparent"// desktop version "black"
             border.width: 0
             border.color: "transparent"// desktop version "lightgray"
+            Component.onCompleted: gasolineIconLoader.active = true
 
         }
         ColumnLayout {
@@ -534,21 +550,32 @@ Item {
            }
 */
         //gasolina
-        QGCColoredImage {
-               id: gasolinePercentageIcon
-               anchors.top:        parent.top
-               anchors.left:       batteryInfoColumn.right
-               anchors.margins:    _toolsMargin
-               width:              height
-               height:             parent.height*2/3
-               source:             "/qmlimages/GasCan.svg"
-               fillMode:           Image.PreserveAspectFit
-               color:              "white"
-               visible: false
-           }
+        Loader {
+            id: gasolineIconLoader
+            anchors.top: parent.top
+            anchors.left: batteryInfoColumn.right
+            anchors.margins: _toolsMargin
+            width: gasolineIconLoader.item ? gasolineIconLoader.item.height : 0
+            height: parent.height * 2 / 3
+            active: false  // set true when you want to load it
+            visible: gasolineIconLoader.item ? gasolineIconLoader.item.visible : false
+
+            sourceComponent: Component {
+                QGCColoredImage {
+                    id: gasolinePercentageIcon
+                    anchors.fill: parent
+                    anchors.margins: 0
+                    source: "/qmlimages/GasCan.svg"
+                    fillMode: Image.PreserveAspectFit
+                    color:  _gasolina > 50 ? "green" : (_gasolina > 20 ? "orange" : "red")
+                    visible: true
+                }
+            }
+        }
+
         DropShadow {
-                anchors.fill: gasolinePercentageIcon
-                source: gasolinePercentageIcon
+                anchors.fill: gasolineIconLoader
+                source: gasolineIconLoader
                 color: "#80000000" // Semi-transparent black shadow
                 radius: 8
                 samples:17
@@ -556,48 +583,13 @@ Item {
                 verticalOffset: 5
                 horizontalOffset: 5
             }
-        Rectangle{
-            id: gasolineIconColorLevelBackground
-            anchors.fill: gasolinePercentageIcon
-            color: "green"
-            visible: false
-        }
-        Rectangle{
-                id: gasolinePercentageBar
-                anchors.top: gasolinePercentageIcon.top
-                anchors.left: gasolinePercentageIcon.left
-                //anchors.margins: _toolsMargin
-                width: gasolinePercentageIcon.width
-                height: gasolinePercentageIcon.height
-                color: _gasolina > 50 ? "green" : (_gasolina > 20 ? "orange" : "red") //gasMouseArea.containsMouse? "green": "red" //Isso aqui vai mudar dependendo do valor de _gasolina
-                visible: false
-                Rectangle{ //BARRA DE ALTURA DINAMICA PRA INDICAR O NÍVEL DE GASOLINA -> HEIGHT = 1-GASOLINA%
-                     anchors.top: parent.top
-                     anchors.left: parent.left
-                     width: parent.width
-                     height: parent.height*(1-_gasolina) // _gasolina | dinamico de acordo com 1-(% gasolina). cor há de ser dinamica também
-                     color: "black" // possível trocar pra outra cor se o contraste estiver ruim. talvez branco
-                }
-
-           }
-        OpacityMask{
-            anchors.fill: gasolinePercentageBar
-            source: gasolinePercentageBar
-            maskSource: gasolinePercentageIcon
-            MouseArea{
-                id: gasMouseArea
-                anchors.fill: parent
-                hoverEnabled : true
-
-            }
-        }
 
         Rectangle{
             id: textBoxGasolinePercentage
-            anchors.verticalCenter: gasolinePercentageIcon.verticalCenter
-            anchors.horizontalCenter: gasolinePercentageIcon.horizontalCenter
-            height: gasolinePercentageIcon.height/3
-            width: gasolinePercentageIcon.width
+            anchors.verticalCenter: gasolineIconLoader.verticalCenter
+            anchors.horizontalCenter: gasolineIconLoader.horizontalCenter
+            height: gasolineIconLoader.height/3
+            width: gasolineIconLoader.width
             visible: visible//gasMouseArea.containsMouse? true: false
             color: "black"
             border.width: 1
@@ -621,7 +613,7 @@ Item {
         QGCColoredImage {
                id: generatorFunctionalityIcon
                anchors.top:        parent.top
-               anchors.left:       gasolinePercentageBar.right
+               anchors.left:       gasolineIconLoader.right
                anchors.leftMargin: _toolsMargin*2
                anchors.topMargin:  _toolsMargin*2
                width:              height
@@ -972,6 +964,7 @@ Item {
                source:             "/qmlimages/rotorsAccell.png"
                fillMode:           Image.PreserveAspectFit
                color:              "white"
+
             }
         Rectangle {
                id: rotorsTempArea
@@ -1101,8 +1094,8 @@ Item {
 
 
     }
-
-
+    }
+}
 
 
 //**************************************************************************************************//
@@ -1112,13 +1105,26 @@ Item {
         id:         toolbarsize
         visible:   false// !QGroundControl.videoManager.fullScreen
     }
-    Item {
-        id: lateralDataArea
+    Loader{
+        id: lateralDataLoader
         anchors.right : parent.right
-        anchors.bottom : bottomDataArea.top
+        anchors.bottom : bottomDataLoader.top
         anchors.top:toolbarsize.bottom
         width : parent.width - mainViewWidth
         height: mainViewHeight
+        active: active  // or false if you want to delay loading
+        asynchronous: true
+        onLoaded:{
+            let now = new Date();
+            console.log("lateralDataArea LOADED at " + now.toLocaleTimeString());
+            //bottomDataLoader.active = true;
+        }
+
+            sourceComponent: Component {
+                    id: lateralDataComponent
+    Item {
+        id: lateralDataArea
+        anchors.fill: parent
         //Ilustração Aeronave {EXPERIMENTAR COLOCAR NO FUNDO DO LATERAL VIEW AREA PRA MANTER CENTRALIZAÇÃO HORIZONTAL}
 
         Rectangle {
@@ -1134,7 +1140,7 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            height: (parent.height -bottomDataArea.height)/6
+            height: (parent.height -bottomDataLoader.height)/6
             /*Text {
                     text: "Flight Time\n 00.00.00"
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -1152,7 +1158,7 @@ Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     spacing:                0
-                    height: (parent.height -bottomDataArea.height)/6
+                    height: (parent.height -bottomDataLoader.height)/6
 
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
@@ -1177,13 +1183,13 @@ Item {
             anchors.top: flightTimeArea.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: (parent.height -bottomDataArea.height)/6
+            height: (parent.height -bottomDataLoader.height)/6
             ColumnLayout {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     spacing:                0
-                    height: (parent.height -bottomDataArea.height)/6
+                    height: (parent.height -bottomDataLoader.height)/6
 
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
@@ -1209,13 +1215,13 @@ Item {
             anchors.top: dist2HomeArea.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: (parent.height -bottomDataArea.height)/6
+            height: (parent.height -bottomDataLoader.height)/6
             ColumnLayout {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     spacing:                0
-                    height: (parent.height -bottomDataArea.height)/6
+                    height: (parent.height -bottomDataLoader.height)/6
 
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
@@ -1240,13 +1246,13 @@ Item {
             anchors.top: dist2WaypointArea.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: (parent.height -bottomDataArea.height)/6
+            height: (parent.height -bottomDataLoader.height)/6
             ColumnLayout {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     spacing:                0
-                    height: (parent.height -bottomDataArea.height)/6
+                    height: (parent.height -bottomDataLoader.height)/6
 
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
@@ -1271,13 +1277,13 @@ Item {
             anchors.top: altitudeRelativeArea.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: (parent.height -bottomDataArea.height)/6
+            height: (parent.height -bottomDataLoader.height)/6
             ColumnLayout {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     spacing:                0
-                    height: (parent.height -bottomDataArea.height)/6
+                    height: (parent.height -bottomDataLoader.height)/6
 
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
@@ -1302,13 +1308,13 @@ Item {
             anchors.top: altitudeBarometricArea.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: (parent.height -bottomDataArea.height)/6
+            height: (parent.height -bottomDataLoader.height)/6
             ColumnLayout {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     spacing:                0
-                    height: (parent.height -bottomDataArea.height)/6
+                    height: (parent.height -bottomDataLoader.height)/6
 
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
@@ -1333,13 +1339,13 @@ Item {
             anchors.top: horSpeedArea.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: (parent.height -bottomDataArea.height)/6
+            height: (parent.height -bottomDataLoader.height)/6
             ColumnLayout {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     spacing:                0
-                    height: (parent.height -bottomDataArea.height)/6
+                    height: (parent.height -bottomDataLoader.height)/6
 
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
@@ -1381,202 +1387,147 @@ Item {
                 font.pixelSize: 7
                 color: "white"
                 z:1000
+                Component.onCompleted: aircraftAndRotorsLoader.active = true
             }
 
 
-        QGCColoredImage {
-               id: aircraftIcon
-               anchors.top:        parent.bottom
-               anchors.left:       parent.left
-               //anchors.verticalCenter: parent.verticalCenter
-               //anchors.margins:    _toolsMargin
-               width:              parent.width
-               height:             width
-               source:             "/qmlimages/GD25.png"
-               fillMode:           Image.PreserveAspectFit
-               color:              "white"
+        Loader {
+            id: aircraftAndRotorsLoader
+            active: false
+            asynchronous: true
 
-                   /*Rectangle {
-                       id:rotor1ColorRect
-                       x: parent.width*0.05
-                       y: parent.height*1/15
-                       width: parent.width/2//*10/64
-                       height: width/5
-                       rotation:-30
-                       //radius: width / 2
-                       border.width: _selected_rotor_3? 3:1
-                       border.color: _selected_rotor_3? "yellow":"black"
-                       color:  Qt.rgba(1, 0, 0, 0.5)
-                       z: 1100
-                       visible: false
-                   }
-                   ColorOverlay{
-                   anchors.fill:rotor1ColorRect
-                   source:aircraftIcon
-                   color:"green"
-                   }
-                   Rectangle {
-                       x: parent.width*0.635
-                       y: parent.height*1/24
-                       width: parent.width*10/64
-                       height: width
-                       radius: width / 2
-                       border.width: _selected_rotor_5? 3:1
-                       border.color: _selected_rotor_5? "yellow":"black"
-                       color:  Qt.rgba(1, 0, 0, 0.5)
-                       z: 1100
-                   }
-                   Rectangle {
-                       x: parent.width*(-0.025)
-                       y: parent.height*0.425
-                       width: parent.width*10/64
-                       height: width
-                       radius: width / 2
-                       border.width: _selected_rotor_2? 3:1
-                       border.color: _selected_rotor_2? "yellow":"black"
-                       color:  Qt.rgba(1, 0, 0, 0.5)
-                       z: 1100
-                   }
-                   Rectangle {
-                       x: parent.width*0.855
-                       y: parent.height*0.425
-                       width: parent.width*10/64
-                       height: width
-                       radius: width / 2
-                       border.width: _selected_rotor_1? 3:1
-                       border.color: _selected_rotor_1? "yellow":"black"
-                       color:  Qt.rgba(1, 0, 0, 0.5)
-                       z: 1100
-                   }
-                   Rectangle {
-                       x: parent.width*0.195
-                       y: parent.height*0.8
-                       width: parent.width*10/64
-                       height: width
-                       radius: width / 2
-                       border.width: _selected_rotor_6? 3:1
-                       border.color: _selected_rotor_6? "yellow":"black"
-                       color:  Qt.rgba(1, 0, 0, 0.5)
-                       z: 1100
-                   }
-                   Rectangle {
-                       x: parent.width*0.635
-                       y: parent.height*0.8
-                       width: parent.width*10/64
-                       height: width
-                       radius: width / 2
-                       border.width: _selected_rotor_4? 3:1
-                       border.color: _selected_rotor_4? "yellow":"black"
-                       color:  Qt.rgba(1, 0, 0, 0.5)
-                       z: 1100
-                   }*/
-            }
-        QGCColoredImage{
-            id:rotor1Mask
-            anchors.fill: aircraftIcon
-            source: "/qmlimages/rotor1mask.png"
-            color: "white"//_selected_rotor_1 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
-        }
-        DropShadow {
-                anchors.fill: rotor1Mask
-                source: rotor1Mask
-                color: "yellow" // Semi-transparent black shadow
-                radius: 8
-                samples:17
-                spread: 0.4
-                verticalOffset: 0
-                horizontalOffset: 0
-                visible: _selected_rotor_1
-            }
-        QGCColoredImage{
-            id:rotor2Mask
-            anchors.fill: aircraftIcon
-            source: "/qmlimages/rotor2mask.png"
-            color: "white"//_selected_rotor_2 ? "yellow" : "white" //TODO: Mudar isso aqui pra depender da aceleração do rotor
-        }
-        DropShadow {
-                anchors.fill: rotor2Mask
-                source: rotor2Mask
-                color: "yellow" // yellow selected border
-                radius: 8
-                samples:17
-                spread: 0.4
-                verticalOffset: 0
-                horizontalOffset: 0
-                visible: _selected_rotor_2
-            }
-        QGCColoredImage{
-            id:rotor3Mask
-            anchors.fill: aircraftIcon
-            source: "/qmlimages/rotor3mask.png"
-            color: "white"//_selected_rotor_3 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
-        }
-        DropShadow {
-                anchors.fill: rotor3Mask
-                source: rotor3Mask
-                color: "yellow" // yellow selected border
-                radius: 8
-                samples:17
-                spread: 0.4
-                verticalOffset: 0
-                horizontalOffset: 0
-                visible: _selected_rotor_3
-            }
-        QGCColoredImage{
-            id:rotor4Mask
-            anchors.fill: aircraftIcon
-            source: "/qmlimages/rotor4mask.png"
-            color: "white"//_selected_rotor_4 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
-        }
-        DropShadow {
-                anchors.fill: rotor4Mask
-                source: rotor4Mask
-                color: "yellow" // yellow selected border
-                radius: 8
-                samples:17
-                spread: 0.4
-                verticalOffset: 0
-                horizontalOffset: 0
-                visible: _selected_rotor_4
-            }
-        QGCColoredImage{
-            id:rotor5Mask
-            anchors.fill: aircraftIcon
-            source: "/qmlimages/rotor5mask.png"
-            color: "white"//_selected_rotor_5 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
-        }
-        DropShadow {
-                anchors.fill: rotor5Mask
-                source: rotor5Mask
-                color: "yellow" // yellow selected border
-                radius: 8
-                samples:17
-                spread: 0.4
-                verticalOffset: 0
-                horizontalOffset: 0
-                visible: _selected_rotor_5
-            }
-        QGCColoredImage{
-            id:rotor6Mask
-            anchors.fill: aircraftIcon
-            source: "/qmlimages/rotor6mask.png"
-            color: "white"//_selected_rotor_6 ? "yellow" : "white"  //TODO: Mudar isso aqui pra depender da aceleração do rotor
-        }
-        DropShadow {
-                anchors.fill: rotor6Mask
-                source: rotor6Mask
-                color: "yellow" // yellow selected border
-                radius: 8
-                samples:17
-                spread: 0.4
-                verticalOffset: 0
-                horizontalOffset: 0
-                visible: _selected_rotor_6
-            }
+            anchors.top: parent.bottom
+            anchors.left: parent.left
+            width: parent.width
+            height: width
 
+            sourceComponent: Component {
+                Item {
+                    width: parent.width
+                    height: width
+
+                    QGCColoredImage {
+                        id: aircraftIcon
+                        anchors.fill: parent
+                        source: "/qmlimages/GD25_lowres.png"
+                        fillMode: Image.PreserveAspectFit
+                        color: "white"
+                    }
+
+                    QGCColoredImage {
+                        id: rotor1Mask
+                        anchors.fill: parent
+                        source: "/qmlimages/rotor1mask_lowres.png"
+                        color: "white"
+                    }
+                    DropShadow {
+                        anchors.fill: rotor1Mask
+                        source: rotor1Mask
+                        color: "yellow"
+                        radius: 8
+                        samples: 17
+                        spread: 0.4
+                        verticalOffset: 0
+                        horizontalOffset: 0
+                        visible: _selected_rotor_1
+                    }
+
+                    QGCColoredImage {
+                        id: rotor2Mask
+                        anchors.fill: parent
+                        source: "/qmlimages/rotor2mask_lowres.png"
+                        color: "white"
+                    }
+                    DropShadow {
+                        anchors.fill: rotor2Mask
+                        source: rotor2Mask
+                        color: "yellow"
+                        radius: 8
+                        samples: 17
+                        spread: 0.4
+                        verticalOffset: 0
+                        horizontalOffset: 0
+                        visible: _selected_rotor_2
+                    }
+
+                    QGCColoredImage {
+                        id: rotor3Mask
+                        anchors.fill: parent
+                        source: "/qmlimages/rotor3mask_lowres.png"
+                        color: "white"
+                    }
+                    DropShadow {
+                        anchors.fill: rotor3Mask
+                        source: rotor3Mask
+                        color: "yellow"
+                        radius: 8
+                        samples: 17
+                        spread: 0.4
+                        verticalOffset: 0
+                        horizontalOffset: 0
+                        visible: _selected_rotor_3
+                    }
+
+                    QGCColoredImage {
+                        id: rotor4Mask
+                        anchors.fill: parent
+                        source: "/qmlimages/rotor4mask_lowres.png"
+                        color: "white"
+                    }
+                    DropShadow {
+                        anchors.fill: rotor4Mask
+                        source: rotor4Mask
+                        color: "yellow"
+                        radius: 8
+                        samples: 17
+                        spread: 0.4
+                        verticalOffset: 0
+                        horizontalOffset: 0
+                        visible: _selected_rotor_4
+                    }
+
+                    QGCColoredImage {
+                        id: rotor5Mask
+                        anchors.fill: parent
+                        source: "/qmlimages/rotor5mask_lowres.png"
+                        color: "white"
+                    }
+                    DropShadow {
+                        anchors.fill: rotor5Mask
+                        source: rotor5Mask
+                        color: "yellow"
+                        radius: 8
+                        samples: 17
+                        spread: 0.4
+                        verticalOffset: 0
+                        horizontalOffset: 0
+                        visible: _selected_rotor_5
+                    }
+
+                    QGCColoredImage {
+                        id: rotor6Mask
+                        anchors.fill: parent
+                        source: "/qmlimages/rotor6mask_lowres.png"
+                        color: "white"
+                    }
+                    DropShadow {
+                        anchors.fill: rotor6Mask
+                        source: rotor6Mask
+                        color: "yellow"
+                        radius: 8
+                        samples: 17
+                        spread: 0.4
+                        verticalOffset: 0
+                        horizontalOffset: 0
+                        visible: _selected_rotor_6
+                    }
+                }
+            }
+        }
 
     }
-
+    }
+    }
 
 //**************************************************************************************************//
 //                          MAIN VIEW AREA                                                          //
@@ -1585,8 +1536,14 @@ Item {
         id: mainViewArea
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.right: lateralDataArea.left
-        anchors.bottom: bottomDataArea.top
+        anchors.right: lateralDataLoader.left
+        anchors.bottom: bottomDataLoader.top
+
+        Component.onCompleted:{
+            let now = new Date();
+            console.log("mainViewArea LOADED at " + now.toLocaleTimeString());lateralDataLoader.active = true; bottomDataLoader.active = true;}
+
+
 
         QGCToolInsets {
             id:                     _toolInsets
@@ -1607,6 +1564,8 @@ Item {
             anchors.bottom:     parent.bottom
             anchors.left:       parent.left
             anchors.right:      parent.right
+
+
 
 
             FlyViewMap {

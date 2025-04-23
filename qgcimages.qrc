@@ -222,5 +222,12 @@
         <file alias="rotor4mask.png">resources/rotor4mask.png</file>
         <file alias="rotor5mask.png">resources/rotor5mask.png</file>
         <file alias="rotor3mask.png">resources/rotor3mask.png</file>
+        <file alias="GD25_lowres.png">resources/GD25_Icon_lowres.PNG</file>
+        <file alias="rotor6mask_lowres.png">resources/rotor6mask_lowres.png</file>
+        <file alias="rotor5mask_lowres.png">resources/rotor5mask_lowres.png</file>
+        <file alias="rotor4mask_lowres.png">resources/rotor4mask_lowres.png</file>
+        <file alias="rotor3mask_lowres.png">resources/rotor3mask_lowres.png</file>
+        <file alias="rotor2mask_lowres.png">resources/rotor2mask_lowres.png</file>
+        <file alias="rotor1mask_lowres.png">resources/rotor1mask_lowres.png</file>
     </qresource>
 </RCC>

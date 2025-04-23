@@ -48,6 +48,13 @@ ApplicationWindow {
         // Start the sequence of first run prompt(s)
         firstRunPromptManager.nextPrompt()
     }
+
+    /*Rectangle{
+        anchors.fill: mainWindow
+        color: red
+        visible: true
+        z:100000000000
+    }*/
     /*Timer {
             interval: 10; running: true; repeat: true
             onTriggered: {
@@ -57,6 +64,7 @@ ApplicationWindow {
             //flyView._current_generator = controller4.generator_curr/100
             }
         }*/
+
 
     Item{
         id: mvipArea
@@ -101,6 +109,8 @@ ApplicationWindow {
 
     //-------------------------------------------------------------------------
     //-- Global Scope Variables
+
+
 
     QtObject {
         id: globals
@@ -264,7 +274,7 @@ ApplicationWindow {
         color:          QGroundControl.globalPalette.window
     }
 
-    FlyView { 
+    FlyView {
         id:                     flyView
         anchors.fill:           parent
         utmspSendActTrigger:    _utmspSendActTrigger
