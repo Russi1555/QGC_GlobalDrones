@@ -41,12 +41,6 @@ SettingsPage {
             visible:    _appSettings.qLocaleLanguage.visible
         }
 
-        LabelledFactComboBox {
-            label:      qsTr("Color Scheme")
-            fact:       _appSettings.indoorPalette
-            indexModel: false
-            visible:    _appSettings.indoorPalette.visible
-        }
 
         FactCheckBoxSlider {
             Layout.fillWidth: true
