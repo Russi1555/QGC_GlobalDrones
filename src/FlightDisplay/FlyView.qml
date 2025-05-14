@@ -64,7 +64,6 @@ Item {
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property var    _mapControl:            mapControl
 
-
     property real  mainViewHeight: parent.height*5/6
     property real  mainViewWidth : parent.width - (parent.height - mainViewHeight) //garantir simetria
     property bool _cameraExchangeActive : false
@@ -146,7 +145,7 @@ Item {
 
     property var res_x: parent.width
     property var res_y: parent.height
-
+    property real radianPI: Math.PI/180
 
 
     function _calcCenterViewPort() {
@@ -156,6 +155,112 @@ Item {
 
     function dropMessageIndicatorTool() {
         toolbar.dropMessageIndicatorTool();
+    }
+
+    function dmsStringToRadians(input) {
+        console.log(input);
+        input=input.toString()
+
+        // Step 1: Split by commas (to separate latitude and longitude)
+        const parts = input.split(',');
+        console.log(parts)
+        if (parts.length < 2) {
+            throw new Error("Invalid DMS input format");
+        }
+
+        // Step 2: Process each part (latitude and longitude)
+        function dmsToDecimal(dmsStr) {
+            // Remove extra spaces and split by the degree symbol '°', then by the minute and second symbols
+            const [degMinSec, direction] = dmsStr.trim().split('  ').filter(part => part !== '');
+
+            // Split the degree, minutes, and seconds
+            const [degrees, minutes, seconds] = degMinSec.split(/°|'|"/).map(Number);
+
+            // Calculate the decimal degrees
+            let decimalDegrees = degrees + minutes / 60 + seconds / 3600;
+
+            // Apply the sign based on direction (N/S/E/W)
+            if (direction === 'S' || direction === 'W') {
+                decimalDegrees *= -1;
+            }
+
+            return decimalDegrees;
+        }
+
+        // Step 3: Convert both latitude and longitude to decimal degrees
+        const latDeg = dmsToDecimal(parts[0]);
+        const lonDeg = dmsToDecimal(parts[1]);
+
+        // Step 4: Convert decimal degrees to radians
+        const toRadians = (deg) => deg * Math.PI / 180;
+
+        return {
+            latRadians: toRadians(latDeg),
+            lonRadians: toRadians(lonDeg)
+        };
+    }
+
+
+    function radianCoordsToCartesian(lat,lon){
+        const R = 6371; //Raio arredondado da terra
+        const x = R * Math.cos(lat)* Math.cos(lon);
+        const y = R * Math.cos(lat)* Math.sin(lon);
+        const z = R * Math.sin(lat);
+        return {
+            x:x,
+            y:y,
+            z:z
+        };
+    }
+
+    /*
+            console.log("poly count: ",_geoFenceController.polygons.count.toString())
+            console.log("  poly 0 -> ",_geoFenceController.polygons.get(0).path)
+            console.log("  poly first NS coord -> ",_geoFenceController.polygons.get(0).path[0])
+            console.log("  poly first WE coord -> ",_geoFenceController.polygons.get(0).path[1])
+            console.log("  vehicle pos -> ", _activeVehicle.coordinate.toString())
+    */
+
+    function breachDetection() {
+        const vehicle_lat = _activeVehicle.coordinate.latitude.valueOf()*radianPI;
+        const vehicle_lon = _activeVehicle.coordinate.longitude.valueOf()*radianPI;
+        var coords = radianCoordsToCartesian(vehicle_lat,vehicle_lon);
+
+        const v_x = coords.x;
+        const v_y = coords.y;
+        //até aqui convertemos as coordenadas geograficas do veículo em coordenadas cartesianas
+        var inside = false;
+        var level_breach = -1
+        //para cada poligono
+        for(let i = 0; i<_geoFenceController.polygons.count.valueOf();i++){
+            let polygon = _geoFenceController.polygons.get(i).path;
+            let p1 = dmsStringToRadians(polygon[0]);
+            p1 = radianCoordsToCartesian(p1.latRadians, p1.lonRadians)
+            let p2;
+            //para cada vértice
+            let num_vertices = _geoFenceController.polygons.get(i).path.length;
+            for(let j = 1; j<=num_vertices;j++){
+                p2 = dmsStringToRadians(polygon[j % num_vertices]);
+                p2 = radianCoordsToCartesian(p2.latRadians, p2.lonRadians);
+
+                if(v_y > Math.min(p1.y,p2.y)){
+                    if(v_y <= Math.max(p1.y,p2.y)){
+                        if(v_x <= Math.max(p1.x,p2.x)){
+                            const x_intersection = ((v_y - p1.y) * (p2.x - p1.x)) / (p2.y - p1.y) + p1.x;
+                            if (p1.x === p2.x || v_x <= x_intersection) {
+                                inside = !inside;
+                            }
+                        }
+                    }
+                }
+                p1=p2;
+            }
+        if(!inside){
+            level_breach = i;
+        }
+        else{inside = false;}
+        }
+    return {breach:!inside, level:level_breach};
     }
 
     function generatorAlert(batValues, gerValues, oldGerMed){ //TODO: incluir condicional tensão da bateria < 44V
@@ -227,9 +332,18 @@ Item {
             if(segundos_restantes <10) {segundos_restantes_string = "0" + segundos_restantes.toString()}
             else {segundos_restantes_string = segundos_restantes.toString()}
 
-            console.log("_gasolina: ",_gasolina)
-            console.log(horas_restantes,minutos_restantes,segundos_restantes)
-            console.log(res_x, res_y)
+            console.log("poly count: ",_geoFenceController.polygons.count.toString())
+            console.log("  poly 0 -> ",_geoFenceController.polygons.get(0).path)
+            console.log("  poly first NS coord -> ",_geoFenceController.polygons.get(0).path[0])
+            console.log("  poly first WE coord -> ",_geoFenceController.polygons.get(0).path[1])
+            console.log("  vehicle pos -> ", _activeVehicle.coordinate.toString())
+
+            var breach_val = breachDetection()
+            if(breach_val.level>-1){
+                console.log("VIOLACAO DE ESPAÇO AEREO NÍVEL ",breach_val.level +1);
+            }
+            //console.log(horas_restantes,minutos_restantes,segundos_restantes)
+            //console.log(res_x, res_y)
 
             //update()
 
