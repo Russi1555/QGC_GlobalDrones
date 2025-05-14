@@ -127,6 +127,9 @@ Item {
     property bool _selected_rotor_5: false
     property bool _selected_rotor_6: false
 
+    property real _motor_temp: 30
+    property real _motor_rpm: 3000
+
     property int horas_restantes:0
     property int minutos_restantes:0
     property int segundos_restantes:0
@@ -1048,18 +1051,18 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   "30° C"
+                    text:                   _motor_temp.toString()+"°C"
                     font.bold: true
-                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    font.pointSize:         8
                 }
 
                 Text {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   "RPM: 6000"
+                    text:                   "RPM: "+_motor_rpm.toFixed(0)
                     font.bold: true
-                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    font.pointSize:         8
                 }
 
             }

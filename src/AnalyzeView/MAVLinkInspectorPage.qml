@@ -35,20 +35,50 @@ AnalyzePage {
     property real gasoline_value: 0
     property real generator_curr: 0
 
+    property real _RPM_R1: 0
+    property real _RPM_R2: 0
+    property real _RPM_R3: 0
+    property real _RPM_R4: 0
+    property real _RPM_R5: 0
+    property real _RPM_R6: 0
+
+    property real _RPM_MOTOR:0
+    property real _TEMP_MOTOR:0
     MAVLinkInspectorController {
         id: controller
     }
 
     Timer {
-        interval: 10000; running: true; repeat: true
+        interval: 10; running: true; repeat: true
         onTriggered: { //IMPORTANTE: O INDICE DO CURSYSTEM.SELECTED MUDA. TEM QUE FAZER UMA FUNÇÃO PRA VASCULHAR.
 
             //console.log("Teste novo")
             //console.log(controller.activeSystem.messages.count)
             for (var i = 0; i < controller.activeSystem.messages.count; i++){
 
+                if(controller.activeSystem.messages.get(i).name === "ESC_TELEMETRY_1_TO_4"){
+                    curSystem.selected = i
+                    console.log(controller.activeSystem.messages.get(i).fields.get(4).name, controller.activeSystem.messages.get(i).fields.get(4).value)
+                    _RPM_R1 = controller.activeSystem.messages.get(i).fields.get(4).value[0]
+                    _RPM_R2 = controller.activeSystem.messages.get(i).fields.get(4).value[1]
+                    _RPM_R3 = controller.activeSystem.messages.get(i).fields.get(4).value[2]
+                    _RPM_R4 = controller.activeSystem.messages.get(i).fields.get(4).value[3]
+                    _RPM_R5 = controller.activeSystem.messages.get(i).fields.get(4).value[4]
+                    _RPM_R6 = controller.activeSystem.messages.get(i).fields.get(4).value[5]
+                }
+                if(controller.activeSystem.messages.get(i).name === "NAMED_VALUE_FLOAT"){
+                    curSystem.selected = i
+                    console.log(controller.activeSystem.messages.get(i).fields.get(1).name, controller.activeSystem.messages.get(i).fields.get(2).value)
+                    console.log(controller.activeSystem.messages.get(i).fields.get(1).value)
+                    if(controller.activeSystem.messages.get(i).fields.get(1).value === "ICE_RPM"){
+                        _RPM_MOTOR = controller.activeSystem.messages.get(i).fields.get(2).value
+                    }
+                    else{
+                        _TEMP_MOTOR = controller.activeSystem.messages.get(i).fields.get(2).value
+                    }
+                }
                 //PEGAR VIOLAÇÕES DE ESPAÇO AEREO
-                if (controller.activeSystem.messages.get(i).name === "FENCE_STATUS"){
+                /*if (controller.activeSystem.messages.get(i).name === "FENCE_STATUS"){
                 //    console.log("found");
                 //    console.log(i)
                     curSystem.selected = i
@@ -92,7 +122,7 @@ AnalyzePage {
                     }
                     console.log("ID: ", controller.activeSystem.messages.get(i).fields.get(0).value,controller.activeSystem.messages.get(i).fields.get(4).value)
 
-                }
+                }*/
 
                    /* console.log(controller.activeSystem.messages.get(5).fields.get(1).type);
                     console.log(controller.activeSystem.messages.get(5).fields.get(1).value);

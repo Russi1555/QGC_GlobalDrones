@@ -55,15 +55,23 @@ ApplicationWindow {
         visible: true
         z:100000000000
     }*/
-    /*Timer {
+    Timer {
             interval: 10; running: true; repeat: true
             onTriggered: {
+            flyView._aceleracao_rotor_1 = controller4._RPM_R1
+            flyView._aceleracao_rotor_2 = controller4._RPM_R2
+            flyView._aceleracao_rotor_3 = controller4._RPM_R3
+            flyView._aceleracao_rotor_4 = controller4._RPM_R4
+            flyView._aceleracao_rotor_5 = controller4._RPM_R5
+            flyView._aceleracao_rotor_6 = controller4._RPM_R6
+            flyView._motor_rpm    = controller4._RPM_MOTOR
+            flyView._motor_temp   = controller4._TEMP_MOTOR
             //flyView._tensao_bateria = controller4.battery_tension
             //flyView._gasolina = controller4.gasoline_value / 1000
                 //console.log("GASOLINA MAINROOTWINDOW: ", controller4.gasoline_value / 1000)
             //flyView._current_generator = controller4.generator_curr/100
             }
-        }*/
+        }
 
 
     Item{
