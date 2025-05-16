@@ -315,7 +315,8 @@ Item {
             _current_bateria =
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
-            _rcQuality = _activeVehicle.rcRSSI.rawValue
+            _rcQuality = _activeVehicle.mavlinkLossPercent.valueOf().toFixed(1)
+            console.log(_activeVehicle.rcRSSI.valueOf())
             _gasolina = _activeVehicle.batteries.get(1).percentRemaining.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
             //_current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
             _current_bateria = _activeVehicle.batteries.get(0).current.rawValue.toFixed(2)
@@ -358,7 +359,7 @@ Item {
             //TODO: DELETAR DEPOIS. APENAS TESTE
             //_current_generator = Math.floor(Math.random() * 120)
            // _current_battery_ARRAY.push(Math.floor(Math.random() * 120))
-            _current_generator_ARRAY.push(_current_generator)
+            /*_current_generator_ARRAY.push(_current_generator)
             _aceleracao_rotor_1 = Math.floor(Math.random()*1000) + 1000
             aceleracao_rotor_1_ARRAY.push(_aceleracao_rotor_1)
             _aceleracao_rotor_2 = Math.floor(Math.random()*1000) + 1000
@@ -370,7 +371,7 @@ Item {
             _aceleracao_rotor_5 = Math.floor(Math.random()*1000) + 1000
             aceleracao_rotor_5_ARRAY.push(_aceleracao_rotor_5)
             _aceleracao_rotor_6 = Math.floor(Math.random()*1000) + 1000
-            aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)
+            aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)*/
 
             //AQUI PRA CIMA É SÓ PRA TESTE
            // console.log((oldGeneratorMediamValue/20)/maxGeneratorCurrent, (40/maxGeneratorCurrent))
@@ -916,7 +917,7 @@ Item {
                height:             parent.height*2/3
                source:             "/qmlimages/RC.svg"
                fillMode:           Image.PreserveAspectFit
-               color:           _rcQuality > 90 ? "green" : (_rcQuality>=80? "yellow": (_rcQuality >= 70 ? "orange":"red"))
+               color:           _rcQuality < 10 ? "green" : (_rcQuality<=20? "yellow": (_rcQuality <= 30 ? "orange":"red"))
                visible: false
             }
 
@@ -927,7 +928,7 @@ Item {
                 anchors.margins: _toolsMargin
                 width: rcInformationIcon.width
                 height: parent.height*2/3
-                color: _rcQuality > 90 ? "green" : (_rcQuality>=80? "yellow": (_rcQuality >= 70 ? "orange":"red"))//rcMouseArea.containsMouse? "green": "red"
+                color: _rcQuality < 10 ? "green" : (_rcQuality<=20? "yellow": (_rcQuality <= 30 ? "orange":"red"))//rcMouseArea.containsMouse? "green": "red"
                 visible: false
 
                 Rectangle{
@@ -1117,24 +1118,24 @@ Item {
 
                    // Popula o modelo com valores dinamicamente
                    Component.onCompleted: {
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_1 - 1000)/1000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_2 - 1000)/1000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_3 - 1000)/1000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_4 - 1000)/1000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_5 - 1000)/1000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_6 - 1000)/1000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_1)/4000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_2)/4000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_3)/4000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_4)/4000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_5)/4000 });
+                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_6)/4000 });
 
                    }
 
                    Timer{//Atualiza os valores periodicamente [TODO: mudar interval depois]
-                        interval: 1000; running: true; repeat: true
+                        interval: 100; running: true; repeat: true
                         onTriggered: {
-                        accellRotorModel.set(0, { aceleracao: (_aceleracao_rotor_1 - 1000)/1000 });
-                        accellRotorModel.set(1, { aceleracao: (_aceleracao_rotor_2 - 1000)/1000 });
-                        accellRotorModel.set(2, { aceleracao: (_aceleracao_rotor_3 - 1000)/1000 });
-                        accellRotorModel.set(3, { aceleracao: (_aceleracao_rotor_4 - 1000)/1000 });
-                        accellRotorModel.set(4, { aceleracao: (_aceleracao_rotor_5 - 1000)/1000 });
-                        accellRotorModel.set(5, { aceleracao: (_aceleracao_rotor_6 - 1000)/1000 });
+                        accellRotorModel.set(0, { aceleracao: _aceleracao_rotor_1/4000 });
+                        accellRotorModel.set(1, { aceleracao: _aceleracao_rotor_2/4000 });
+                        accellRotorModel.set(2, { aceleracao: _aceleracao_rotor_3/4000 });
+                        accellRotorModel.set(3, { aceleracao: _aceleracao_rotor_4/4000 });
+                        accellRotorModel.set(4, { aceleracao: _aceleracao_rotor_5/4000 });
+                        accellRotorModel.set(5, { aceleracao: _aceleracao_rotor_6/4000 });
                         //console.log((_aceleracao_rotor_1-1000)/1000,_aceleracao_rotor_2,_aceleracao_rotor_3)
                        }
                     }
