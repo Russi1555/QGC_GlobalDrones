@@ -312,10 +312,9 @@ Item {
             _pct_bateria = (((_activeVehicle.batteries.get(0).voltage.rawValue/100)/50)*10000).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
             _tensao_bateria = (_activeVehicle.batteries.get(0).voltage.rawValue).toFixed(2)
             _current_bateria = (_activeVehicle.batteries.get(0).current.rawValue).toFixed(2)
-            _current_bateria =
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
-            _rcQuality = _activeVehicle.mavlinkLossPercent.valueOf().toFixed(1)
+            _rcQuality = (100 - _activeVehicle.mavlinkLossPercent.valueOf().toFixed(1)).toFixed(1)
             console.log(_activeVehicle.rcRSSI.valueOf())
             _gasolina = _activeVehicle.batteries.get(1).percentRemaining.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
             //_current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
@@ -356,22 +355,13 @@ Item {
             //_current_battery_ARRAY.push(_current_bateria) //populando dinamicamente array de valores de corrente da bateria
             //_current_generator_ARRAY.push(_current_generator)//populando dinamicamente array de valores de corrente do gerador
 
-            //TODO: DELETAR DEPOIS. APENAS TESTE
-            //_current_generator = Math.floor(Math.random() * 120)
-           // _current_battery_ARRAY.push(Math.floor(Math.random() * 120))
-            /*_current_generator_ARRAY.push(_current_generator)
-            _aceleracao_rotor_1 = Math.floor(Math.random()*1000) + 1000
+            _current_generator_ARRAY.push(_current_generator)
             aceleracao_rotor_1_ARRAY.push(_aceleracao_rotor_1)
-            _aceleracao_rotor_2 = Math.floor(Math.random()*1000) + 1000
             aceleracao_rotor_2_ARRAY.push(_aceleracao_rotor_2)
-            _aceleracao_rotor_3 = Math.floor(Math.random()*1000) + 1000
             aceleracao_rotor_3_ARRAY.push(_aceleracao_rotor_3)
-            _aceleracao_rotor_4 = Math.floor(Math.random()*1000) + 1000
             aceleracao_rotor_4_ARRAY.push(_aceleracao_rotor_4)
-            _aceleracao_rotor_5 = Math.floor(Math.random()*1000) + 1000
             aceleracao_rotor_5_ARRAY.push(_aceleracao_rotor_5)
-            _aceleracao_rotor_6 = Math.floor(Math.random()*1000) + 1000
-            aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)*/
+            aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)
 
             //AQUI PRA CIMA É SÓ PRA TESTE
            // console.log((oldGeneratorMediamValue/20)/maxGeneratorCurrent, (40/maxGeneratorCurrent))
@@ -545,7 +535,7 @@ Item {
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   _pct_bateria > 9? _pct_bateria+"%": "0"+_pct_bateria+"%"
-                   font.pixelSize:         13//ScreenTools.smallFontPixelHeight
+                   font.pixelSize:       _androidBuild ?  13 : 24//ScreenTools.smallFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
@@ -555,7 +545,7 @@ Item {
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
                     text:                   _tensao_bateria + " V"
-                    font.pixelSize:         13//ScreenTools.smallFontPixelHeight
+                    font.pixelSize:         _androidBuild ?  13 : 24///ScreenTools.smallFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
@@ -564,8 +554,8 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   _current_bateria + " mA"
-                    font.pixelSize:         13//ScreenTools.smallFontPixelHeight
+                    text:                   _current_bateria + " A"
+                    font.pixelSize:         _androidBuild ?  13 : 24///ScreenTools.smallFontPixelHeight
                     visible: textBoxBatteryInfo.visible
                     font.bold: true
                 }
@@ -893,7 +883,7 @@ Item {
                     color:                  "White"
                     text:                   "Count: " + _satCount
                     font.bold: true
-                    //font.pointSize:         ScreenTools.mediumFontPixelHeight
+                    font.pixelSize:         _androidBuild ?  13 : 24
                 }
                 Text {
                     Layout.alignment:       Qt.AlignHCenter
@@ -901,6 +891,7 @@ Item {
                     color:                  "White"
                     text:                   "PDOP: "+ _satPDOP
                     font.bold: true
+                    font.pixelSize:         _androidBuild ?  13 : 24
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
 
@@ -917,7 +908,7 @@ Item {
                height:             parent.height*2/3
                source:             "/qmlimages/RC.svg"
                fillMode:           Image.PreserveAspectFit
-               color:           _rcQuality < 10 ? "green" : (_rcQuality<=20? "yellow": (_rcQuality <= 30 ? "orange":"red"))
+               color:           _rcQuality > 90 ? "green" : (_rcQuality>=80? "yellow": (_rcQuality >= 70 ? "orange":"red"))
                visible: false
             }
 
@@ -928,7 +919,7 @@ Item {
                 anchors.margins: _toolsMargin
                 width: rcInformationIcon.width
                 height: parent.height*2/3
-                color: _rcQuality < 10 ? "green" : (_rcQuality<=20? "yellow": (_rcQuality <= 30 ? "orange":"red"))//rcMouseArea.containsMouse? "green": "red"
+                color: _rcQuality > 90 ? "green" : (_rcQuality>=80? "yellow": (_rcQuality >= 70 ? "orange":"red"))//rcMouseArea.containsMouse? "green": "red"
                 visible: false
 
                 Rectangle{
@@ -1054,7 +1045,7 @@ Item {
                     color:                  "White"
                     text:                   _motor_temp.toString()+"°C"
                     font.bold: true
-                    font.pointSize:         8
+                    font.pixelSize:         _androidBuild ?  8 : 20
                 }
 
                 Text {
@@ -1063,7 +1054,7 @@ Item {
                     color:                  "White"
                     text:                   "RPM: "+_motor_rpm.toFixed(0)
                     font.bold: true
-                    font.pointSize:         8
+                    font.pixelSize:         _androidBuild ?  8 : 20
                 }
 
             }
@@ -1193,18 +1184,18 @@ Item {
                        width: parent.width/6
                        height: parent.height/20
                        y: {
-                           if(index == 0) return parent.height*((medAceleracaoRotor1-1000)/1000)
-                           else if (index == 1) return parent.height*((medAceleracaoRotor2-1000)/1000)
-                           else if (index == 2) return parent.height*((medAceleracaoRotor3-1000)/1000)
-                           else if (index == 3) return parent.height*((medAceleracaoRotor4-1000)/1000)
-                           else if (index == 4) return parent.height*((medAceleracaoRotor5-1000)/1000)
-                           else if (index == 5) return parent.height*((medAceleracaoRotor6-1000)/1000)
+                           if(index == 0) return parent.height*((medAceleracaoRotor1)/4000)
+                           else if (index == 1) return parent.height*((medAceleracaoRotor2)/4000)
+                           else if (index == 2) return parent.height*((medAceleracaoRotor3)/4000)
+                           else if (index == 3) return parent.height*((medAceleracaoRotor4)/4000)
+                           else if (index == 4) return parent.height*((medAceleracaoRotor5)/4000)
+                           else if (index == 5) return parent.height*((medAceleracaoRotor6)/4000)
                        }//parent.height*(oldGeneratorMediamValue/20)/maxGeneratorCurrent
                        x: index*parent.width/6
                        z:1000
                        color: "white"
                        border.color:"black"
-                       border.width:1
+                       border.width:0.5
                    }
                    }
 
@@ -1283,7 +1274,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Est. Time"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
                     Text {
@@ -1291,7 +1282,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   horas_restantes_string+":"+minutos_restantes_string+":"+segundos_restantes_string
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24//ScreenTools.smallFontPixelHeight
                         font.bold: true
                     }
             }
@@ -1314,7 +1305,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Dist. Home"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
                     Text {
@@ -1322,7 +1313,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   _activeVehicle.distanceToHome.value === "NaN"? 0 : _activeVehicle.distanceToHome.value.toFixed(2)+"m"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
             }
@@ -1346,7 +1337,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Dist. WP"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
                     Text {
@@ -1354,7 +1345,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   _activeVehicle.distanceToNextWP.value == "NaN"? 0 : _activeVehicle.distanceToNextWP.value+"m"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
             }
@@ -1377,7 +1368,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Alt. LIDAR"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
                     Text {
@@ -1385,7 +1376,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   _activeVehicle.rangeFinderDist.value.toFixed(2) + "m" //altitudeRelative.value*10)/10 + "m"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
             }
@@ -1408,7 +1399,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Alt. AMSL"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
                     Text {
@@ -1416,7 +1407,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   Math.round(_activeVehicle.altitudeAMSL.value*10)/10 + "m"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
             }
@@ -1439,15 +1430,15 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Hor. speed"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
                     Text {
                         Layout.alignment:       Qt.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
-                        color:                  "White"
+                        color:                  Math.round(_activeVehicle.airSpeed.value*10)/10 < 17? "White" : "Red"
                         text:                   Math.round(_activeVehicle.airSpeed.value*10)/10 +"m/s"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
             }
@@ -1470,7 +1461,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   "Vert. speed"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
                     Text {
@@ -1478,7 +1469,7 @@ Item {
                         verticalAlignment:      Text.AlignVCenter
                         color:                  "White"
                         text:                   Math.round(_activeVehicle.climbRate.value*10)/10+"m/s"
-                        font.pixelSize:         15//ScreenTools.smallFontPixelHeight
+                        font.pixelSize:         _androidBuild ?  15 : 24
                         font.bold: true
                     }
             }
@@ -1491,8 +1482,8 @@ Item {
                 anchors.bottom: maxSpeedText.top
                 anchors.margins: _toolsMargin // Adiciona um pequeno espaço do canto
                 font.bold: true
-                font.pixelSize: 7
-                color: "white"
+                font.pixelSize:         _androidBuild ?  7 : 12
+                color: qgcPal.toolbarBackground
                 z:1000
             }
         Text {
@@ -1502,8 +1493,8 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.margins: _toolsMargin // Adiciona um pequeno espaço do canto
                 font.bold: true
-                font.pixelSize: 7
-                color: "white"
+                font.pixelSize:         _androidBuild ?  7 : 12
+                color: qgcPal.toolbarBackground
                 z:1000
                 Component.onCompleted: aircraftAndRotorsLoader.active = true
             }
