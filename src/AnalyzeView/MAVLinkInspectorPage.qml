@@ -35,12 +35,14 @@ AnalyzePage {
     property real gasoline_value: 0
     property real generator_curr: 0
 
-    property real _RPM_R1: 0
-    property real _RPM_R2: 0
-    property real _RPM_R3: 0
-    property real _RPM_R4: 0
-    property real _RPM_R5: 0
-    property real _RPM_R6: 0
+    property var _RPM_FULL1
+    property var _RPM_FULL2
+    property int _RPM_R1: 10
+    property int _RPM_R2: 20
+    property int _RPM_R3: 30
+    property int _RPM_R4: 40
+    property int _RPM_R5: 50
+    property int _RPM_R6: 60
 
     property real _RPM_MOTOR:0
     property real _TEMP_MOTOR:0
@@ -59,12 +61,30 @@ AnalyzePage {
                 if(controller.activeSystem.messages.get(i).name === "ESC_TELEMETRY_1_TO_4"){
                     curSystem.selected = i
                     console.log(controller.activeSystem.messages.get(i).fields.get(4).name, controller.activeSystem.messages.get(i).fields.get(4).value)
-                    _RPM_R1 = controller.activeSystem.messages.get(i).fields.get(4).value[0]
+                    _RPM_FULL1 = controller.activeSystem.messages.get(i).fields.get(4).value
+                     _RPM_FULL1 = String(_RPM_FULL1).split(",")
+                    _RPM_R1 = parseInt(_RPM_FULL1[0].trim())
+                    _RPM_R2 = parseInt(_RPM_FULL1[1].trim())
+                    _RPM_R3 = parseInt(_RPM_FULL1[2].trim())
+                    _RPM_R4 = parseInt(_RPM_FULL1[3].trim())
+                    //_RPM_R5 = _RPM_FULL1[4]
+                   // _RPM_R6 = _RPM_FULL1[5]
+                    /*_RPM_R1 = controller.activeSystem.messages.get(i).fields.get(4).value[0]
                     _RPM_R2 = controller.activeSystem.messages.get(i).fields.get(4).value[1]
                     _RPM_R3 = controller.activeSystem.messages.get(i).fields.get(4).value[2]
                     _RPM_R4 = controller.activeSystem.messages.get(i).fields.get(4).value[3]
                     _RPM_R5 = controller.activeSystem.messages.get(i).fields.get(4).value[4]
-                    _RPM_R6 = controller.activeSystem.messages.get(i).fields.get(4).value[5]
+                    _RPM_R6 = controller.activeSystem.messages.get(i).fields.get(4).value[5]*/
+                    console.log("RPMs: ",_RPM_R1,_RPM_R2,_RPM_R3,_RPM_R4,_RPM_R5,_RPM_R6, "MAVINSPECTOR")
+
+                }
+                if(controller.activeSystem.messages.get(i).name === "ESC_TELEMETRY_5_TO_8"){
+                    curSystem.selected = i
+                    console.log(controller.activeSystem.messages.get(i).fields.get(4).name, controller.activeSystem.messages.get(i).fields.get(4).value)
+                    _RPM_FULL2 = controller.activeSystem.messages.get(i).fields.get(4).value
+                    _RPM_FULL2 = String(_RPM_FULL2).split(",")
+                    _RPM_R5 = parseInt(_RPM_FULL2[0].trim())
+                    _RPM_R6 = parseInt(_RPM_FULL2[1].trim())
                 }
                 if(controller.activeSystem.messages.get(i).name === "NAMED_VALUE_FLOAT"){
                     curSystem.selected = i

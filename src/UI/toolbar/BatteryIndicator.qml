@@ -127,6 +127,7 @@ Item {
                 source:             "/qmlimages/Battery.svg"
                 fillMode:           Image.PreserveAspectFit
                 color:              getBatteryColor()
+                visible: false
             }
 
            ColumnLayout {
@@ -141,7 +142,7 @@ Item {
                     color:                  getBatteryColor()
                     text:                   getBatteryPercentageText()
                     font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
-                    visible:                _showBoth || _showPercentage
+                    visible:                false//_showBoth || _showPercentage
                 }
 
                 QGCLabel {
@@ -149,7 +150,7 @@ Item {
                     font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
                     color:                  getBatteryColor()
                     text:                   getBatteryVoltageText()
-                    visible:                _showBoth || _showVoltage
+                    visible:                false//_showBoth || _showVoltage
                 }
             }
         }

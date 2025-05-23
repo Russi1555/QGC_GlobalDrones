@@ -83,6 +83,7 @@ SetupPage {
                                 source:             qgcPal.globalTheme === QGCPalette.Light ? "/qmlimages/LowBatteryLight.svg" : "/qmlimages/LowBattery.svg"
                                 height:             _imageHeight
                                 anchors.centerIn:   parent
+                                visible: false
                             }
                         }
                         GridLayout {

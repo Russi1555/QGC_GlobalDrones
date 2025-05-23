@@ -35,6 +35,8 @@ import Qt5Compat.GraphicalEffects
 Item {
     id: _root
 
+    property bool _GD60: false
+
     // These should only be used by MainRootWindow
     property var planController:    _planController
     property var guidedController:  _guidedController
@@ -149,6 +151,8 @@ Item {
     property var res_x: parent.width
     property var res_y: parent.height
     property real radianPI: Math.PI/180
+
+    property string popUp_breachAlert: "Invasão do Volume de Ground Risk Buffer!"
 
 
     function _calcCenterViewPort() {
@@ -314,10 +318,10 @@ Item {
             _current_bateria = (_activeVehicle.batteries.get(0).current.rawValue).toFixed(2)
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
-            _rcQuality = (100 - _activeVehicle.mavlinkLossPercent.valueOf().toFixed(1)).toFixed(1)
+            _rcQuality = _activeVehicle.rcSSI//(100 - _activeVehicle.mavlinkLossPercent.valueOf().toFixed(1)).toFixed(1)
             console.log(_activeVehicle.rcRSSI.valueOf())
             _gasolina = _activeVehicle.batteries.get(1).percentRemaining.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
-            //_current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
+            _current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
             _current_bateria = _activeVehicle.batteries.get(0).current.rawValue.toFixed(2)
 
 
@@ -344,6 +348,7 @@ Item {
             var breach_val = breachDetection()
             if(breach_val.level>-1){
                 console.log("VIOLACAO DE ESPAÇO AEREO NÍVEL ",breach_val.level +1);
+                breachAlertPopup.open()
             }
             //console.log(horas_restantes,minutos_restantes,segundos_restantes)
             //console.log(res_x, res_y)
@@ -362,6 +367,8 @@ Item {
             aceleracao_rotor_4_ARRAY.push(_aceleracao_rotor_4)
             aceleracao_rotor_5_ARRAY.push(_aceleracao_rotor_5)
             aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)
+            console.log("RPMs: ",_aceleracao_rotor_1,_aceleracao_rotor_2,_aceleracao_rotor_3,_aceleracao_rotor_4,_aceleracao_rotor_5,_aceleracao_rotor_6)
+
 
             //AQUI PRA CIMA É SÓ PRA TESTE
            // console.log((oldGeneratorMediamValue/20)/maxGeneratorCurrent, (40/maxGeneratorCurrent))
@@ -431,6 +438,7 @@ Item {
             asynchronous: true
             onLoaded: {let now = new Date();
                 console.log("bottomDataArea LOADED at " + now.toLocaleTimeString());}
+
             sourceComponent: Component {
                     id: bottomDataComponent
                 Item {
@@ -908,7 +916,7 @@ Item {
                height:             parent.height*2/3
                source:             "/qmlimages/RC.svg"
                fillMode:           Image.PreserveAspectFit
-               color:           _rcQuality > 90 ? "green" : (_rcQuality>=80? "yellow": (_rcQuality >= 70 ? "orange":"red"))
+               color:           _activeVehicle.rcRSSI.toPrecision(1) > 90 ? "green" : (_activeVehicle.rcRSSI.toPrecision(1)>=80? "yellow": (_activeVehicle.rcRSSI.toPrecision(1) >= 70 ? "orange":"red"))
                visible: false
             }
 
@@ -919,7 +927,7 @@ Item {
                 anchors.margins: _toolsMargin
                 width: rcInformationIcon.width
                 height: parent.height*2/3
-                color: _rcQuality > 90 ? "green" : (_rcQuality>=80? "yellow": (_rcQuality >= 70 ? "orange":"red"))//rcMouseArea.containsMouse? "green": "red"
+                color: _activeVehicle.rcRSSI.toPrecision(1) > 90 ? "green" : (_activeVehicle.rcRSSI.toPrecision(1)>=80? "yellow": (_activeVehicle.rcRSSI.toPrecision(1) >= 70 ? "orange":"red"))//rcMouseArea.containsMouse? "green": "red"
                 visible: false
 
                 Rectangle{
@@ -970,7 +978,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   _rcQuality + "%"
+                    text:                   _activeVehicle.rcRSSI.toString() //_rcQuality + "%"
                     font.bold: true
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
@@ -1045,7 +1053,7 @@ Item {
                     color:                  "White"
                     text:                   _motor_temp.toString()+"°C"
                     font.bold: true
-                    font.pixelSize:         _androidBuild ?  8 : 20
+                    font.pixelSize:         _androidBuild ?  8 : (_GD60? 10:20)
                 }
 
                 Text {
@@ -1054,7 +1062,26 @@ Item {
                     color:                  "White"
                     text:                   "RPM: "+_motor_rpm.toFixed(0)
                     font.bold: true
-                    font.pixelSize:         _androidBuild ?  8 : 20
+                    font.pixelSize:         _androidBuild ?  8 : (_GD60? 10:20)
+                }
+                Text {
+                    Layout.alignment:       Qt.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    color:                  "White"
+                    text:                   _motor_temp.toString()+"°C"
+                    font.bold: true
+                    font.pixelSize:         _androidBuild ?  8 : (_GD60? 10:20)
+                    visible: _GD60? true:false
+                }
+
+                Text {
+                    Layout.alignment:       Qt.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    color:                  "White"
+                    text:                   "RPM: "+_motor_rpm.toFixed(0)
+                    font.bold: true
+                    font.pixelSize:         _androidBuild ?  8 : (_GD60? 10:20)
+                    visible: _GD60? true:false
                 }
 
             }
@@ -1109,24 +1136,35 @@ Item {
 
                    // Popula o modelo com valores dinamicamente
                    Component.onCompleted: {
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_1)/4000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_2)/4000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_3)/4000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_4)/4000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_5)/4000 });
-                       accellRotorModel.append({ aceleracao: (_aceleracao_rotor_6)/4000 });
+                       if (_GD60){
+                            accellRotorModel.append({ aceleracao: (_aceleracao_rotor_1)/3850 });
+                            accellRotorModel.append({ aceleracao: (_aceleracao_rotor_2)/3850 });
+                            accellRotorModel.append({ aceleracao: (_aceleracao_rotor_3)/3850 });
+                            accellRotorModel.append({ aceleracao: (_aceleracao_rotor_4)/3850 });
+                            accellRotorModel.append({ aceleracao: (_aceleracao_rotor_5)/3850 });
+                            accellRotorModel.append({ aceleracao: (_aceleracao_rotor_6)/3850 });
+                        }
+                       else{
+                           accellRotorModel.append({ aceleracao: (_aceleracao_rotor_1)/3850 });
+                           accellRotorModel.append({ aceleracao: (_aceleracao_rotor_2)/3850 });
+                           accellRotorModel.append({ aceleracao: (_aceleracao_rotor_3)/3850 });
+                           accellRotorModel.append({ aceleracao: (_aceleracao_rotor_4)/3850 });
+                           accellRotorModel.append({ aceleracao: (_aceleracao_rotor_5)/3850 });
+                           accellRotorModel.append({ aceleracao: (_aceleracao_rotor_6)/3850 });
+                       }
 
                    }
 
                    Timer{//Atualiza os valores periodicamente [TODO: mudar interval depois]
                         interval: 100; running: true; repeat: true
                         onTriggered: {
-                        accellRotorModel.set(0, { aceleracao: _aceleracao_rotor_1/4000 });
-                        accellRotorModel.set(1, { aceleracao: _aceleracao_rotor_2/4000 });
-                        accellRotorModel.set(2, { aceleracao: _aceleracao_rotor_3/4000 });
-                        accellRotorModel.set(3, { aceleracao: _aceleracao_rotor_4/4000 });
-                        accellRotorModel.set(4, { aceleracao: _aceleracao_rotor_5/4000 });
-                        accellRotorModel.set(5, { aceleracao: _aceleracao_rotor_6/4000 });
+                        accellRotorModel.set(0, { aceleracao: _aceleracao_rotor_1/3850 });
+                        accellRotorModel.set(1, { aceleracao: _aceleracao_rotor_2/3850 });
+                        accellRotorModel.set(2, { aceleracao: _aceleracao_rotor_3/3850 });
+                        accellRotorModel.set(3, { aceleracao: _aceleracao_rotor_4/3850 });
+                        if (!_GD60){
+                        accellRotorModel.set(4, { aceleracao: _aceleracao_rotor_5/3850 });
+                        accellRotorModel.set(5, { aceleracao: _aceleracao_rotor_6/3850 });}
                         //console.log((_aceleracao_rotor_1-1000)/1000,_aceleracao_rotor_2,_aceleracao_rotor_3)
                        }
                     }
@@ -1135,9 +1173,9 @@ Item {
                        model: accellRotorModel
 
                        Rectangle {
-                           width: parent.width / 6
+                           width: _GD60? parent.width /4 : parent.width / 6
                            height: model.aceleracao* parent.height // Altura proporcional à aceleracao
-                           x: index * parent.width / 6 // Posiciona horizontalmente
+                           x: _GD60? index * parent.width / 4 : index * parent.width / 6 // Posiciona horizontalmente
                            anchors.bottom: parent.bottom
                            z: parent.z + 1
                            color: "green"
@@ -1196,13 +1234,137 @@ Item {
                        color: "white"
                        border.color:"black"
                        border.width:0.5
+                       visible: false
                    }
                    }
 
            }
 
+        // Dial Accelerometer
+        Item{
+            id: centralRotor_1_Accell
+            anchors.left: rotorsTempArea.right
+            anchors.top: parent.top
+            anchors.margins:    _toolsMargin*2
+            height: parent.height*2/3
+            width: height
+            visible: _GD60? true:false
+            Canvas { //border of
+                anchors.fill: parent
+                id: rotor1Arc
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.clearRect(0, 0, width, height)
+                    ctx.strokeStyle = "gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    var radius = Math.min(width, height) / 2.5
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                    ctx.strokeStyle = "green"//"gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(50)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                }
+            }
+            MouseArea { // Torna o  interativa
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                     console.log("Click Test");
+                }
+                onContainsMouseChanged: {
+                 _selected_rotor_1 = !_selected_rotor_1
+                }
+            }
+            DropShadow {
+                    anchors.fill: parent
+                    source: rotor1Arc
+                    color: "yellow" // Semi-transparent black shadow
+                    radius: 8
+                    samples:17
+                    spread: 0.4
+                    verticalOffset: 0
+                    horizontalOffset: 0
+                    visible: _selected_rotor_1
+                }
+            //Component.onCompleted: requestPaint()
+            Text{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                text: "2000"
+                color:"green"
+                font.bold: true
+            }
+        }
+
+        Item{
+            id: centralRotor_2_Accell
+            anchors.left: centralRotor_1_Accell.right
+            anchors.top: parent.top
+            anchors.margins:    _toolsMargin*2
+            height: parent.height*2/3
+            width: height
+            visible: _GD60? true:false
+            Canvas { //border of
+                anchors.fill: parent
+                id: rotor2Arc
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.clearRect(0, 0, width, height)
+                    ctx.strokeStyle = "gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    var radius = Math.min(width, height) / 2.5
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * 0.25, false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                    ctx.strokeStyle = "green"//"gray" // Arc color
+                    ctx.lineWidth = 8
+                    ctx.beginPath()
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(75)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
+                    ctx.stroke()
+                }
+            }
+            MouseArea { // Torna o  interativa
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                     console.log("Click Test");
+                }
+                onContainsMouseChanged: {
+                 _selected_rotor_1 = !_selected_rotor_1
+                }
+            }
+            DropShadow {
+                    anchors.fill: parent
+                    source: rotor2Arc
+                    color: "yellow" // Semi-transparent black shadow
+                    radius: 8
+                    samples:17
+                    spread: 0.4
+                    verticalOffset: 0
+                    horizontalOffset: 0
+                    visible: _selected_rotor_1
+                }
+            //Component.onCompleted: requestPaint()
+            Text{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                text: "3000"
+                color:"green"
+                font.bold: true
+            }
+        }
+
+
 
     }
+
     }
 }
 
@@ -1850,6 +2012,30 @@ Item {
                 id:                     viewer3DWindow
                 anchors.fill:           parent
             }
+            Popup {
+                    id: breachAlertPopup
+                    x: (parent.width - width) / 2
+                    y: 10  // optional: vertical position
+                    width: parent.width/4
+                    height: 100
+                    modal: false
+                    focus: false
+                    background: null
+                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "yellow"
+                        border.color: "black"
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: popUp_breachAlert
+                            font.bold: true
+                        }
+                    }
+                }
         }
+
     }
 }

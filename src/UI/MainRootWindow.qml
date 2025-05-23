@@ -64,6 +64,7 @@ ApplicationWindow {
             flyView._aceleracao_rotor_4 = controller4._RPM_R4
             flyView._aceleracao_rotor_5 = controller4._RPM_R5
             flyView._aceleracao_rotor_6 = controller4._RPM_R6
+            console.log("RPMs: ",controller4._RPM_R1,controller4._RPM_R2,controller4._RPM_R3,controller4._RPM_R4,controller4._RPM_R5,controller4._RPM_R6, "MAINWINDOW")
             flyView._motor_rpm    = controller4._RPM_MOTOR
             flyView._motor_temp   = controller4._TEMP_MOTOR
             //flyView._tensao_bateria = controller4.battery_tension
@@ -881,4 +882,37 @@ ApplicationWindow {
          flightID:                  _flightID
          anchors.fill:              parent
     }
+    /*Text {
+        text: controller4._RPM_FULL1 + ", " + controller4._RPM_FULL2
+        font.pixelSize: 40
+        x: 200
+        y: 100
+        color: "Yellow"
+        font.bold: true
+        z: 100000000000
+    }
+    Text {
+        text: flyView._aceleracao_rotor_1 + ", " +
+              flyView._aceleracao_rotor_2 + ", " +
+              flyView._aceleracao_rotor_3 + ", " +
+              flyView._aceleracao_rotor_4 + ", " +
+              flyView._aceleracao_rotor_5 + ", " +
+              flyView._aceleracao_rotor_6
+        font.pixelSize: 40
+        x: 200
+        y: 200
+        color: "Red"
+        font.bold: true
+        z: 100000000000
+    }
+    Text {
+        text: controller4._RPM_FULL1[0].trim()
+        font.pixelSize: 40
+        x: 200
+        y: 300
+        color: "Orange"
+        font.bold: true
+        z: 100000000000
+    }*/
+
 }
