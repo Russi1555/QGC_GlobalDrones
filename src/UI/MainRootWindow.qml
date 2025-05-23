@@ -64,7 +64,7 @@ ApplicationWindow {
             flyView._aceleracao_rotor_4 = controller4._RPM_R4
             flyView._aceleracao_rotor_5 = controller4._RPM_R5
             flyView._aceleracao_rotor_6 = controller4._RPM_R6
-            console.log("RPMs: ",controller4._RPM_R1,controller4._RPM_R2,controller4._RPM_R3,controller4._RPM_R4,controller4._RPM_R5,controller4._RPM_R6, "MAINWINDOW")
+            //console.log("RPMs: ",controller4._RPM_R1,controller4._RPM_R2,controller4._RPM_R3,controller4._RPM_R4,controller4._RPM_R5,controller4._RPM_R6, "MAINWINDOW")
             flyView._motor_rpm    = controller4._RPM_MOTOR
             flyView._motor_temp   = controller4._TEMP_MOTOR
             //flyView._tensao_bateria = controller4.battery_tension

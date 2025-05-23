@@ -75,7 +75,7 @@ AnalyzePage {
                     _RPM_R4 = controller.activeSystem.messages.get(i).fields.get(4).value[3]
                     _RPM_R5 = controller.activeSystem.messages.get(i).fields.get(4).value[4]
                     _RPM_R6 = controller.activeSystem.messages.get(i).fields.get(4).value[5]*/
-                    console.log("RPMs: ",_RPM_R1,_RPM_R2,_RPM_R3,_RPM_R4,_RPM_R5,_RPM_R6, "MAVINSPECTOR")
+                    //console.log("RPMs: ",_RPM_R1,_RPM_R2,_RPM_R3,_RPM_R4,_RPM_R5,_RPM_R6, "MAVINSPECTOR")
 
                 }
                 if(controller.activeSystem.messages.get(i).name === "ESC_TELEMETRY_5_TO_8"){

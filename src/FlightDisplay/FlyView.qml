@@ -152,7 +152,18 @@ Item {
     property var res_y: parent.height
     property real radianPI: Math.PI/180
 
-    property string popUp_breachAlert: "Invasão do Volume de Ground Risk Buffer!"
+    property string popUp_breachAlert
+    property string _breachAlertColor
+
+    property bool canShowBreachAlert: true
+
+    Timer {
+        id: breachCooldownTimer
+        interval: 10000 // cooldown de 10 segundos
+        running: false
+        repeat: false
+        onTriggered: canShowBreachAlert = true
+    }
 
 
     function _calcCenterViewPort() {
@@ -313,7 +324,7 @@ Item {
             console.log(_activeVehicle.batteries.get(1).voltage.rawValue)*/
             //console.log(_activeVehicle.batteries.index(1,0).voltage.rawValue)
 
-            _pct_bateria = (((_activeVehicle.batteries.get(0).voltage.rawValue/100)/50)*10000).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
+            _pct_bateria = ((((_activeVehicle.batteries.get(0).voltage.rawValue).toFixed(2) - 42)/8.2)*100).toFixed(2)//(((_activeVehicle.batteries.get(0).voltage.rawValue/100)/50)*10000).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
             _tensao_bateria = (_activeVehicle.batteries.get(0).voltage.rawValue).toFixed(2)
             _current_bateria = (_activeVehicle.batteries.get(0).current.rawValue).toFixed(2)
             _satCount = _activeVehicle.gps.count.rawValue
@@ -321,8 +332,7 @@ Item {
             _rcQuality = _activeVehicle.rcSSI//(100 - _activeVehicle.mavlinkLossPercent.valueOf().toFixed(1)).toFixed(1)
             console.log(_activeVehicle.rcRSSI.valueOf())
             _gasolina = _activeVehicle.batteries.get(1).percentRemaining.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
-            _current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
-            _current_bateria = _activeVehicle.batteries.get(0).current.rawValue.toFixed(2)
+
 
 
             //_gasolina = 15
@@ -346,10 +356,23 @@ Item {
             console.log("  vehicle pos -> ", _activeVehicle.coordinate.toString())
 
             var breach_val = breachDetection()
-            if(breach_val.level>-1){
-                console.log("VIOLACAO DE ESPAÇO AEREO NÍVEL ",breach_val.level +1);
+            if (breach_val.level > -1 && canShowBreachAlert) {
+                console.log("VIOLACAO DE ESPAÇO AEREO NÍVEL ", breach_val.level + 1)
+
+                if (breach_val.level === 0) {
+                    popUp_breachAlert = "Invasão do Volume de Contingência!"
+                    _breachAlertColor = "Yellow"
+                }
+                if (breach_val.level === 1) {
+                    popUp_breachAlert = "Invasão do Volume de Ground Risk Buffer!"
+                    _breachAlertColor = "Orange"
+                }
+
                 breachAlertPopup.open()
+                canShowBreachAlert = false
+                breachCooldownTimer.start()
             }
+
             //console.log(horas_restantes,minutos_restantes,segundos_restantes)
             //console.log(res_x, res_y)
 
@@ -378,7 +401,8 @@ Item {
             //var params = _activeVehicle.parameterNames(1); // Chama a função C++
             //console.log("Parameters:", params); // Imprime no console do QML
             //params.forEach(param => console.log(param.toString())); //TODO: typeError. QStringList e QString não são reconhecidos pelo QML padrão. Resolver isso depois
-
+            _current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
+            _current_bateria = _activeVehicle.batteries.get(0).current.rawValue.toFixed(2)
 
             if(_current_generator_ARRAY.length === 20){ //sabendo que recebemos um dado novo a cada 0.1 segundos, (ver c/ Erich)
                 _returnFunctionArray = generatorAlert(_current_battery_ARRAY, _current_generator_ARRAY, oldGeneratorMediamValue);//executa função
@@ -978,7 +1002,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   _activeVehicle.rcRSSI.toString() //_rcQuality + "%"
+                    text:                   _activeVehicle.rcRSSI.toString() +"%"//_rcQuality + "%"
                     font.bold: true
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
@@ -2025,13 +2049,14 @@ Item {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: "yellow"
+                        color: _breachAlertColor
                         border.color: "black"
 
                         Text {
                             anchors.centerIn: parent
                             text: popUp_breachAlert
                             font.bold: true
+                            font.pixelSize: _androidBuild? 8 : 14
                         }
                     }
                 }
