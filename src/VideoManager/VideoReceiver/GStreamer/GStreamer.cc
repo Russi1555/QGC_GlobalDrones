@@ -136,8 +136,8 @@ GStreamer::blacklist(VideoDecoderOptions option)
     switch (option) {
         case ForceVideoDecoderDefault:
             break;
-        case ForceVideoDecoderSoftware:
-            for(auto name : {"avdec_h264", "avdec_h265"}) {
+        case ForceVideoDecoderSoftware: //se não funcionar, incluir ese  v4l2h265dec coisa da Qualcomm Snapdragon
+            for(auto name : {"avdec_h265"}) { //original : for(auto name : {"avdec_h264", "avdec_h265", "amcviddec-h264"}) {
                 changeRank(name, GST_RANK_PRIMARY + 1);
             }
             break;

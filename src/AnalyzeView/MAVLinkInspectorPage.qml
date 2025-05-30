@@ -51,7 +51,7 @@ AnalyzePage {
     }
 
     Timer {
-        interval: 10; running: true; repeat: true
+        interval: 500; running: true; repeat: true
         onTriggered: { //IMPORTANTE: O INDICE DO CURSYSTEM.SELECTED MUDA. TEM QUE FAZER UMA FUNÇÃO PRA VASCULHAR.
 
             //console.log("Teste novo")
@@ -60,7 +60,7 @@ AnalyzePage {
 
                 if(controller.activeSystem.messages.get(i).name === "ESC_TELEMETRY_1_TO_4"){
                     curSystem.selected = i
-                    console.log(controller.activeSystem.messages.get(i).fields.get(4).name, controller.activeSystem.messages.get(i).fields.get(4).value)
+                   // console.log(controller.activeSystem.messages.get(i).fields.get(4).name, controller.activeSystem.messages.get(i).fields.get(4).value)
                     _RPM_FULL1 = controller.activeSystem.messages.get(i).fields.get(4).value
                      _RPM_FULL1 = String(_RPM_FULL1).split(",")
                     _RPM_R1 = parseInt(_RPM_FULL1[0].trim())
@@ -80,7 +80,7 @@ AnalyzePage {
                 }
                 if(controller.activeSystem.messages.get(i).name === "ESC_TELEMETRY_5_TO_8"){
                     curSystem.selected = i
-                    console.log(controller.activeSystem.messages.get(i).fields.get(4).name, controller.activeSystem.messages.get(i).fields.get(4).value)
+                   // console.log(controller.activeSystem.messages.get(i).fields.get(4).name, controller.activeSystem.messages.get(i).fields.get(4).value)
                     _RPM_FULL2 = controller.activeSystem.messages.get(i).fields.get(4).value
                     _RPM_FULL2 = String(_RPM_FULL2).split(",")
                     _RPM_R5 = parseInt(_RPM_FULL2[0].trim())
@@ -88,8 +88,8 @@ AnalyzePage {
                 }
                 if(controller.activeSystem.messages.get(i).name === "NAMED_VALUE_FLOAT"){
                     curSystem.selected = i
-                    console.log(controller.activeSystem.messages.get(i).fields.get(1).name, controller.activeSystem.messages.get(i).fields.get(2).value)
-                    console.log(controller.activeSystem.messages.get(i).fields.get(1).value)
+                    //console.log(controller.activeSystem.messages.get(i).fields.get(1).name, controller.activeSystem.messages.get(i).fields.get(2).value)
+                   // console.log(controller.activeSystem.messages.get(i).fields.get(1).value)
                     if(controller.activeSystem.messages.get(i).fields.get(1).value === "ICE_RPM"){
                         _RPM_MOTOR = controller.activeSystem.messages.get(i).fields.get(2).value
                     }

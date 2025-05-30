@@ -285,6 +285,12 @@ elseif(MACOS)
             MACOSX_PACKAGE_LOCATION "Resources"
     )
     target_sources(${PROJECT_NAME} PRIVATE ${QGC_APP_ICON})
+    target_sources(${PROJECT_NAME}  PRIVATE
+        src/SiYi/SiYi.cpp
+        src/SiYi/SiYiCamera.cpp
+        src/SiYi/SiYiTransmitter.cpp
+    )
+
     set_target_properties(${PROJECT_NAME}
         PROPERTIES
             MACOSX_BUNDLE TRUE

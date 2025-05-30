@@ -16,6 +16,17 @@ qt_add_library(QGC STATIC
     QGCConfig.h
     QGCToolbox.cc
     QGCToolbox.h
+    SiYi/SiYi.cc
+    SiYi/SiYi.h
+    SiYi/SiYiCamera.cc
+    SiYi/SiYiCamera.h
+    SiYi/SiYiCrcApi.cc
+    SiYi/SiYiCrcApi.h
+    SiYi/SiYiTcpClient.cc
+    SiYi/SiYiTcpClient.h
+    SiYi/SiYiTransmitter.cc
+    SiYi/SiYiTransmitter.h
+    FlightDisplay/FlyViewVideoSiYiController.qml
 
 
 )
@@ -52,7 +63,6 @@ add_subdirectory(Vehicle)
 add_subdirectory(VehicleSetup)
 add_subdirectory(VideoManager)
 add_subdirectory(Viewer3D)
-
 #######################################################
 #               Linking Libraries
 #######################################################

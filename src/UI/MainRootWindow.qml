@@ -21,7 +21,7 @@ import QGroundControl.FlightDisplay
 import QGroundControl.FlightMap
 
 import QGroundControl.UTMSP
-
+import SiYi.Object 1.0
 /// @brief Native QML top level window
 /// All properties defined here are visible to all QML pages.
 ApplicationWindow {
@@ -35,6 +35,7 @@ ApplicationWindow {
     property string _flightID
     property bool   _utmspSendActTrigger
     property bool   _utmspStartTelemetry
+    property SiYiCamera siYiCamera: SiYi.camera
 
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
@@ -56,7 +57,7 @@ ApplicationWindow {
         z:100000000000
     }*/
     Timer {
-            interval: 10; running: true; repeat: true
+            interval: 500; running: true; repeat: true
             onTriggered: {
             flyView._aceleracao_rotor_1 = controller4._RPM_R1
             flyView._aceleracao_rotor_2 = controller4._RPM_R2

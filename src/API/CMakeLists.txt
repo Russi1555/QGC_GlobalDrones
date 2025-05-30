@@ -9,6 +9,7 @@ qt_add_library(API STATIC
     QGCSettings.h
     QmlComponentInfo.cc
     QmlComponentInfo.h
+
 )
 
 target_link_libraries(API

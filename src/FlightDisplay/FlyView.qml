@@ -31,7 +31,9 @@ import QGroundControl.FactControls
 // 3D Viewer modules
 import Viewer3D
 import Qt5Compat.GraphicalEffects
-
+import SiYi.Object 1.0
+import "qrc:/qml/QGroundControl/Controls"
+import "qrc:/qml/QGroundControl/FlightDisplay"
 Item {
     id: _root
 
@@ -176,12 +178,12 @@ Item {
     }
 
     function dmsStringToRadians(input) {
-        console.log(input);
+        //console.log(input);
         input=input.toString()
 
         // Step 1: Split by commas (to separate latitude and longitude)
         const parts = input.split(',');
-        console.log(parts)
+        //console.log(parts)
         if (parts.length < 2) {
             throw new Error("Invalid DMS input format");
         }
@@ -330,7 +332,7 @@ Item {
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
             _rcQuality = _activeVehicle.rcSSI//(100 - _activeVehicle.mavlinkLossPercent.valueOf().toFixed(1)).toFixed(1)
-            console.log(_activeVehicle.rcRSSI.valueOf())
+           // console.log(_activeVehicle.rcRSSI.valueOf())
             _gasolina = _activeVehicle.batteries.get(1).percentRemaining.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
 
 
@@ -349,15 +351,15 @@ Item {
             if(segundos_restantes <10) {segundos_restantes_string = "0" + segundos_restantes.toString()}
             else {segundos_restantes_string = segundos_restantes.toString()}
 
-            console.log("poly count: ",_geoFenceController.polygons.count.toString())
+            /*console.log("poly count: ",_geoFenceController.polygons.count.toString())
             console.log("  poly 0 -> ",_geoFenceController.polygons.get(0).path)
             console.log("  poly first NS coord -> ",_geoFenceController.polygons.get(0).path[0])
             console.log("  poly first WE coord -> ",_geoFenceController.polygons.get(0).path[1])
-            console.log("  vehicle pos -> ", _activeVehicle.coordinate.toString())
+            console.log("  vehicle pos -> ", _activeVehicle.coordinate.toString())*/
 
             var breach_val = breachDetection()
             if (breach_val.level > -1 && canShowBreachAlert) {
-                console.log("VIOLACAO DE ESPAÇO AEREO NÍVEL ", breach_val.level + 1)
+                //console.log("VIOLACAO DE ESPAÇO AEREO NÍVEL ", breach_val.level + 1)
 
                 if (breach_val.level === 0) {
                     popUp_breachAlert = "Invasão do Volume de Contingência!"
@@ -390,7 +392,6 @@ Item {
             aceleracao_rotor_4_ARRAY.push(_aceleracao_rotor_4)
             aceleracao_rotor_5_ARRAY.push(_aceleracao_rotor_5)
             aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)
-            console.log("RPMs: ",_aceleracao_rotor_1,_aceleracao_rotor_2,_aceleracao_rotor_3,_aceleracao_rotor_4,_aceleracao_rotor_5,_aceleracao_rotor_6)
 
 
             //AQUI PRA CIMA É SÓ PRA TESTE
@@ -940,7 +941,7 @@ Item {
                height:             parent.height*2/3
                source:             "/qmlimages/RC.svg"
                fillMode:           Image.PreserveAspectFit
-               color:           _activeVehicle.rcRSSI.toPrecision(1) > 90 ? "green" : (_activeVehicle.rcRSSI.toPrecision(1)>=80? "yellow": (_activeVehicle.rcRSSI.toPrecision(1) >= 70 ? "orange":"red"))
+               color:           _activeVehicle.rcRSSI.toPrecision(1) >= 60 ? "green" : (_activeVehicle.rcRSSI.toPrecision(1)>=30? "yellow": (_activeVehicle.rcRSSI.toPrecision(1) >= 20 ? "orange":"red"))
                visible: false
             }
 
@@ -1853,13 +1854,13 @@ Item {
 
 
 
+
         Item {
             id:                 mapHolder
             anchors.top:        toolbar.bottom
             anchors.bottom:     parent.bottom
             anchors.left:       parent.left
             anchors.right:      parent.right
-
 
 
 
@@ -2061,6 +2062,6 @@ Item {
                     }
                 }
         }
-
     }
+
 }

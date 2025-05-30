@@ -244,4 +244,9 @@ Item {
         id: obstacleDistance
         showText: pipState.state === pipState.fullState
     }
+    /*FlyViewVideoSiYiController {
+            id: siyiController
+            anchors.fill: parent
+            visible: !_mainWindowIsMap
+        }*/
 }

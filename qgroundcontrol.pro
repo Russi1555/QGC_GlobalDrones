@@ -416,6 +416,11 @@ HEADERS += \
     src/API/QGCSettings.h \
     src/API/QmlComponentInfo.h \
     src/GPS/Drivers/src/base_station.h \
+    src/SiYi/SiYi.h \
+    src/SiYi/SiYiCamera.h \
+    src/SiYi/SiYiCrcApi.h \
+    src/SiYi/SiYiTcpClient.h \
+    src/SiYi/SiYiTransmitter.h \
 
 SOURCES += \
     src/QmlControls/CustomAction.cc \
@@ -425,6 +430,11 @@ SOURCES += \
     src/API/QGCOptions.cc \
     src/API/QGCSettings.cc \
     src/API/QmlComponentInfo.cc \
+    src/SiYi/SiYi.cc \
+    src/SiYi/SiYiCamera.cc \
+    src/SiYi/SiYiCrcApi.cc \
+    src/SiYi/SiYiTcpClient.cc \
+    src/SiYi/SiYiTransmitter.cc \
 
 # Main QGC Headers and Source files
 
