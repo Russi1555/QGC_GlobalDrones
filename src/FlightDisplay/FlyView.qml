@@ -37,7 +37,7 @@ import "qrc:/qml/QGroundControl/FlightDisplay"
 Item {
     id: _root
 
-    property bool _GD60: false
+    property bool _GD60: true
 
     // These should only be used by MainRootWindow
     property var planController:    _planController
@@ -80,6 +80,8 @@ Item {
     property int _satCount: 0
     property int _satPDOP: 0
     property var _rcQuality: 0
+    property var _rcQuality_ARRAY: []
+    property var _rcQuality_mean: 0
     property var _current_battery_ARRAY: []
     property var _current_generator_ARRAY: []
     property var _returnFunctionArray: []
@@ -104,17 +106,17 @@ Item {
     property real _tensao_cell_11: 40 //PLACEHOLDER
     property real _tensao_cell_12: 90 //PLACEHOLDER
 
-    property real _aceleracao_rotor_1: 1100 //PLACEHOLDER
+    property real _aceleracao_rotor_1: 0    //PLACEHOLDER
     property var  aceleracao_rotor_1_ARRAY: []
-    property real _aceleracao_rotor_2: 1100 //PLACEHOLDER
+    property real _aceleracao_rotor_2: 0 //PLACEHOLDER
     property var  aceleracao_rotor_2_ARRAY: []
-    property real _aceleracao_rotor_3: 1100 //PLACEHOLDER
+    property real _aceleracao_rotor_3: 0 //PLACEHOLDER
     property var  aceleracao_rotor_3_ARRAY: []
-    property real _aceleracao_rotor_4: 1100 //PLACEHOLDER
+    property real _aceleracao_rotor_4: 0 //PLACEHOLDER
     property var  aceleracao_rotor_4_ARRAY: []
-    property real _aceleracao_rotor_5: 1100 //PLACEHOLDER
+    property real _aceleracao_rotor_5: 0 //PLACEHOLDER
     property var  aceleracao_rotor_5_ARRAY: []
-    property real _aceleracao_rotor_6: 1100 //PLACEHOLDER
+    property real _aceleracao_rotor_6: 0 //PLACEHOLDER
     property var  aceleracao_rotor_6_ARRAY: []
 
     property real medAceleracaoRotor1: 1500
@@ -331,11 +333,23 @@ Item {
             _current_bateria = (_activeVehicle.batteries.get(0).current.rawValue).toFixed(2)
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
-            _rcQuality = _activeVehicle.rcSSI//(100 - _activeVehicle.mavlinkLossPercent.valueOf().toFixed(1)).toFixed(1)
+
+
            // console.log(_activeVehicle.rcRSSI.valueOf())
             _gasolina = _activeVehicle.batteries.get(1).percentRemaining.rawValue//_activeVehicle.batteries.index(0,1).voltage.rawValue
 
 
+            _rcQuality = _activeVehicle.rcSSI//(100 - _activeVehicle.mavlinkLossPercent.valueOf().toFixed(1)).toFixed(1)
+            if(_rcQuality_ARRAY.length === 10){
+            var qual_temp1 = 0;
+            for(var i =0; i<10; i++){
+                qual_temp1 = _rcQuality_ARRAY[i] + qual_temp1
+                }
+            qual_temp1 = qual_temp1/10
+            _rcQuality_mean = qual_temp1
+            _rcQuality_mean = _rcQuality_mean.toFixed(0)
+            _rcQuality_ARRAY.shift();
+            }
 
             //_gasolina = 15
             horas_restantes = Math.floor((7200*(_gasolina/100))/3600)
@@ -404,6 +418,8 @@ Item {
             //params.forEach(param => console.log(param.toString())); //TODO: typeError. QStringList e QString não são reconhecidos pelo QML padrão. Resolver isso depois
             _current_generator = _activeVehicle.batteries.get(2).current.rawValue.toFixed(2)
             _current_bateria = _activeVehicle.batteries.get(0).current.rawValue.toFixed(2)
+
+
 
             if(_current_generator_ARRAY.length === 20){ //sabendo que recebemos um dado novo a cada 0.1 segundos, (ver c/ Erich)
                 _returnFunctionArray = generatorAlert(_current_battery_ARRAY, _current_generator_ARRAY, oldGeneratorMediamValue);//executa função
@@ -941,7 +957,7 @@ Item {
                height:             parent.height*2/3
                source:             "/qmlimages/RC.svg"
                fillMode:           Image.PreserveAspectFit
-               color:           _activeVehicle.rcRSSI.toPrecision(1) >= 60 ? "green" : (_activeVehicle.rcRSSI.toPrecision(1)>=30? "yellow": (_activeVehicle.rcRSSI.toPrecision(1) >= 20 ? "orange":"red"))
+               color:           _rcQuality_mean >= 60 ? "green" : (_rcQuality_mean>=30? "yellow": (_rcQuality_mean >= 20 ? "orange":"red"))
                visible: false
             }
 
@@ -952,7 +968,7 @@ Item {
                 anchors.margins: _toolsMargin
                 width: rcInformationIcon.width
                 height: parent.height*2/3
-                color: _activeVehicle.rcRSSI.toPrecision(1) > 90 ? "green" : (_activeVehicle.rcRSSI.toPrecision(1)>=80? "yellow": (_activeVehicle.rcRSSI.toPrecision(1) >= 70 ? "orange":"red"))//rcMouseArea.containsMouse? "green": "red"
+                color: _rcQuality_mean >= 60 ? "green" : (_rcQuality_mean>=30? "yellow": (_rcQuality_mean >= 20 ? "orange":"red"))//rcMouseArea.containsMouse? "green": "red"
                 visible: false
 
                 Rectangle{
@@ -1003,7 +1019,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   _activeVehicle.rcRSSI.toString() +"%"//_rcQuality + "%"
+                    text:                   _rcQuality_mean.toString()+"%"//_activeVehicle.rcRSSI.toString() +"%"//_rcQuality + "%"
                     font.bold: true
                     //font.pointSize:         ScreenTools.mediumFontPixelHeight
                 }
@@ -1202,7 +1218,7 @@ Item {
                            height: model.aceleracao* parent.height // Altura proporcional à aceleracao
                            x: _GD60? index * parent.width / 4 : index * parent.width / 6 // Posiciona horizontalmente
                            anchors.bottom: parent.bottom
-                           z: parent.z + 1
+                           z: parent.z + 10
                            color: "green"
                            border.color: {
                                if(index == 0 && _selected_rotor_1) return "yellow"
@@ -1705,7 +1721,7 @@ Item {
                     QGCColoredImage {
                         id: aircraftIcon
                         anchors.fill: parent
-                        source: "/qmlimages/GD25_lowres.png"
+                        source: _GD60 ? "/qmlimages/GD60_lowres.png" : "/qmlimages/GD25_lowres.png"
                         fillMode: Image.PreserveAspectFit
                         color: "white"
                     }
@@ -1714,6 +1730,7 @@ Item {
                         id: rotor1Mask
                         anchors.fill: parent
                         source: "/qmlimages/rotor1mask_lowres.png"
+                        visible:  !_GD60
                         color: "white"
                     }
                     DropShadow {
@@ -1733,6 +1750,7 @@ Item {
                         anchors.fill: parent
                         source: "/qmlimages/rotor2mask_lowres.png"
                         color: "white"
+                        visible:  !_GD60
                     }
                     DropShadow {
                         anchors.fill: rotor2Mask
@@ -1751,6 +1769,7 @@ Item {
                         anchors.fill: parent
                         source: "/qmlimages/rotor3mask_lowres.png"
                         color: "white"
+                        visible:  !_GD60
                     }
                     DropShadow {
                         anchors.fill: rotor3Mask
@@ -1769,6 +1788,7 @@ Item {
                         anchors.fill: parent
                         source: "/qmlimages/rotor4mask_lowres.png"
                         color: "white"
+                        visible:  !_GD60
                     }
                     DropShadow {
                         anchors.fill: rotor4Mask
@@ -1787,6 +1807,7 @@ Item {
                         anchors.fill: parent
                         source: "/qmlimages/rotor5mask_lowres.png"
                         color: "white"
+                        visible:  !_GD60
                     }
                     DropShadow {
                         anchors.fill: rotor5Mask
@@ -1805,6 +1826,7 @@ Item {
                         anchors.fill: parent
                         source: "/qmlimages/rotor6mask_lowres.png"
                         color: "white"
+                        visible:  !_GD60
                     }
                     DropShadow {
                         anchors.fill: rotor6Mask
