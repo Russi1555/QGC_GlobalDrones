@@ -136,6 +136,9 @@ Item {
     property real _motor_temp: 30
     property real _motor_rpm: 3000
 
+    property int _rpm_horizontal1: 0
+    property int _rpm_horizontal2: 0
+
     property int horas_restantes:0
     property int minutos_restantes:0
     property int segundos_restantes:0
@@ -398,15 +401,23 @@ Item {
             //Monitoramento do gerador TODO: DESCOMENTAR DEPOIS
             //_current_battery_ARRAY.push(_current_bateria) //populando dinamicamente array de valores de corrente da bateria
             //_current_generator_ARRAY.push(_current_generator)//populando dinamicamente array de valores de corrente do gerador
-
-            _current_generator_ARRAY.push(_current_generator)
-            aceleracao_rotor_1_ARRAY.push(_aceleracao_rotor_1)
-            aceleracao_rotor_2_ARRAY.push(_aceleracao_rotor_2)
-            aceleracao_rotor_3_ARRAY.push(_aceleracao_rotor_3)
-            aceleracao_rotor_4_ARRAY.push(_aceleracao_rotor_4)
-            aceleracao_rotor_5_ARRAY.push(_aceleracao_rotor_5)
-            aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)
-
+            if(_GD60){
+                if (_activeVehicle.armed || _activeVehicle.flying){
+                    _aceleracao_rotor_1 = Math.random() * (555-480) + 480
+                    _aceleracao_rotor_2 = Math.random() * (555-480) + 480
+                    _aceleracao_rotor_3 = Math.random() * (555-480) + 480
+                    _aceleracao_rotor_4 = Math.random() * (555-480) + 480
+                }
+            }
+            else{
+                _current_generator_ARRAY.push(_current_generator)
+                aceleracao_rotor_1_ARRAY.push(_aceleracao_rotor_1)
+                aceleracao_rotor_2_ARRAY.push(_aceleracao_rotor_2)
+                aceleracao_rotor_3_ARRAY.push(_aceleracao_rotor_3)
+                aceleracao_rotor_4_ARRAY.push(_aceleracao_rotor_4)
+                aceleracao_rotor_5_ARRAY.push(_aceleracao_rotor_5)
+                aceleracao_rotor_6_ARRAY.push(_aceleracao_rotor_6)
+            }
 
             //AQUI PRA CIMA É SÓ PRA TESTE
            // console.log((oldGeneratorMediamValue/20)/maxGeneratorCurrent, (40/maxGeneratorCurrent))
@@ -1306,7 +1317,7 @@ Item {
                     ctx.strokeStyle = "green"//"gray" // Arc color
                     ctx.lineWidth = 8
                     ctx.beginPath()
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(50)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(_rpm_horizontal1/4000)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
                     //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
                     ctx.stroke()
                 }
@@ -1336,7 +1347,7 @@ Item {
             Text{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
-                text: "2000"
+                text: _rpm_horizontal1
                 color:"green"
                 font.bold: true
             }
@@ -1366,7 +1377,7 @@ Item {
                     ctx.strokeStyle = "green"//"gray" // Arc color
                     ctx.lineWidth = 8
                     ctx.beginPath()
-                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(75)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
+                    ctx.arc(width / 2, height / 2, radius,  Math.PI * 0.75, Math.PI * (0.75 + accelerationPercentageToRadius(_rpm_horizontal2/4000)) , false) // ctx.arc(width,height,radius,start,end,anticlockwise)
                     //ctx.arc(width / 2, height / 2, 100, Math.PI * 0.75, Math.PI * 0.25, false) // Arc from 135° to 45°
                     ctx.stroke()
                 }
@@ -1396,7 +1407,7 @@ Item {
             Text{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
-                text: "3000"
+                text: _rpm_horizontal2
                 color:"green"
                 font.bold: true
             }

@@ -59,12 +59,15 @@ ApplicationWindow {
     Timer {
             interval: 500; running: true; repeat: true
             onTriggered: {
+            if (!flyView._GD60){
+
             flyView._aceleracao_rotor_1 = controller4._RPM_R1
             flyView._aceleracao_rotor_2 = controller4._RPM_R2
             flyView._aceleracao_rotor_3 = controller4._RPM_R3
             flyView._aceleracao_rotor_4 = controller4._RPM_R4
             flyView._aceleracao_rotor_5 = controller4._RPM_R5
             flyView._aceleracao_rotor_6 = controller4._RPM_R6
+            }
             //console.log("RPMs: ",controller4._RPM_R1,controller4._RPM_R2,controller4._RPM_R3,controller4._RPM_R4,controller4._RPM_R5,controller4._RPM_R6, "MAINWINDOW")
             flyView._motor_rpm    = controller4._RPM_MOTOR
             flyView._motor_temp   = controller4._TEMP_MOTOR
