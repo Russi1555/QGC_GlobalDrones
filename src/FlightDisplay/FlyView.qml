@@ -344,6 +344,11 @@ Item {
             _pct_bateria_1 = ((((_activeVehicle.batteries.get(_battery1Index).voltage.rawValue).toFixed(2) - 42)/8.2)*100).toFixed(2)//(((_activeVehicle.batteries.get(0).voltage.rawValue/100)/50)*10000).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
             _tensao_bateria_1 = (_activeVehicle.batteries.get(_battery1Index).voltage.rawValue).toFixed(2)
             _current_bateria_1 = (_activeVehicle.batteries.get(_battery1Index).current.rawValue).toFixed(2)
+
+            _pct_bateria_2 = ((((_activeVehicle.batteries.get(_battery1Index).voltage.rawValue).toFixed(2) - 20)/5.2)*100).toFixed(2)//(((_activeVehicle.batteries.get(0).voltage.rawValue/100)/50)*10000).toFixed(2)//_activeVehicle.batteries.get(0).percentRemaining.rawValue
+            _tensao_bateria_2 = (_activeVehicle.batteries.get(_battery1Index).voltage.rawValue).toFixed(2)
+            _current_bateria_2 = (_activeVehicle.batteries.get(_battery1Index).current.rawValue).toFixed(2)
+
             _satCount = _activeVehicle.gps.count.rawValue
             _satPDOP = _activeVehicle.gps.lock.rawValue
 
@@ -713,7 +718,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   _pct_bateria_1 > 9? _pct_bateria_1+"%": "0"+_pct_bateria_1+"%"
+                    text:                   _pct_bateria_2 > 9? _pct_bateria_2+"%": "0"+_pct_bateria_2+"%"
                    font.pixelSize:       _androidBuild ?  13 : 24//ScreenTools.smallFontPixelHeight
                     visible: _GD60//textBoxBatteryInfo_1.visible
                     font.bold: true
@@ -723,7 +728,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   _tensao_bateria_1 + " V"
+                    text:                   _tensao_bateria_2 + " V"
                     font.pixelSize:         _androidBuild ?  13 : 24///ScreenTools.smallFontPixelHeight
                     visible: _GD60//textBoxBatteryInfo_1.visible
                     font.bold: true
@@ -733,7 +738,7 @@ Item {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                     color:                  "White"
-                    text:                   _current_bateria_1 + " A"
+                    text:                   _current_bateria_2 + " A"
                     font.pixelSize:         _androidBuild ?  13 : 24///ScreenTools.smallFontPixelHeight
                     visible: _GD60//textBoxBatteryInfo_1.visible
                     font.bold: true
@@ -950,7 +955,7 @@ Item {
                     anchors.top:generatorCurrentBar.top
                     anchors.left:generatorCurrentBar.left
                     width:generatorCurrentBar.width
-                    height: generatorCurrentBar.height * (1-(_current_generator/maxGeneratorCurrent))
+                    height: _current_generator >= 0 ?  generatorCurrentBar.height * (1-(_current_generator/maxGeneratorCurrent)): generatorCurrentBar.height
                     color:"black"
                 }
                 Rectangle{
